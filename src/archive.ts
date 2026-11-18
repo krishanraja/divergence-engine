@@ -35,27 +35,91 @@ function safeNamespace(ns: string): string {
   return ns.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80) || "default";
 }
 
-export class Archive {
-  private readonly dir: string;
-  sparks: ArchivedSpark[] = [];
-  lenses: Record<string, LensStats> = {};
+/**
+ * Where namespace memory lives. Files on the machine running the engine by default;
+ * a host such as Control Center supplies its own (a database), so memory survives
+ * ephemeral runners and is shared by every door into the engine.
+ */
+export interface MemoryStore {
+  readonly id: string;
+  loadSparks(namespace: string): Promise<ArchivedSpark[]>;
+  appendSparks(namespace: string, entries: ArchivedSpark[]): Promise<void>;
+  loadLensStats(namespace: string): Promise<Record<string, LensStats>>;
+  saveLensStats(namespace: string, stats: Record<string, LensStats>): Promise<void>;
+}
 
-  constructor(namespace: string, root = divergentHome()) {
-    this.dir = path.join(root, safeNamespace(namespace));
+export class FileMemoryStore implements MemoryStore {
+  readonly id = "file";
+  constructor(private readonly root = divergentHome()) {}
+
+  private dir(ns: string) {
+    return path.join(this.root, safeNamespace(ns));
   }
 
-  async load(embedder: Embedder): Promise<void> {
-    await mkdir(this.dir, { recursive: true });
+  async loadSparks(ns: string): Promise<ArchivedSpark[]> {
     try {
-      const raw = await readFile(path.join(this.dir, "sparks.jsonl"), "utf8");
-      this.sparks = raw
+      const raw = await readFile(path.join(this.dir(ns), "sparks.jsonl"), "utf8");
+      return raw
         .split("\n")
         .filter(Boolean)
         .map((l) => JSON.parse(l) as ArchivedSpark);
     } catch {
-      this.sparks = [];
+      return [];
     }
-    const stale = this.sparks.filter((s) => s.embedder !== embedder.id);
+  }
+
+  async appendSparks(ns: string, entries: ArchivedSpark[]): Promise<void> {
+    if (!entries.length) return;
+    await mkdir(this.dir(ns), { recursive: true });
+    await appendFile(path.join(this.dir(ns), "sparks.jsonl"), entries.map((e) => JSON.stringify(e)).join("\n") + "\n");
+  }
+
+  async loadLensStats(ns: string): Promise<Record<string, LensStats>> {
+    try {
+      return JSON.parse(await readFile(path.join(this.dir(ns), "lenses.json"), "utf8"));
+    } catch {
+      return {};
+    }
+  }
+
+  async saveLensStats(ns: string, stats: Record<string, LensStats>): Promise<void> {
+    await mkdir(this.dir(ns), { recursive: true });
+    await writeFile(path.join(this.dir(ns), "lenses.json"), JSON.stringify(stats, null, 2));
+  }
+}
+
+/** In-memory store, for tests and for hosts that want no persistence. */
+export class MemoryOnlyStore implements MemoryStore {
+  readonly id = "memory";
+  private readonly sparks = new Map<string, ArchivedSpark[]>();
+  private readonly lenses = new Map<string, Record<string, LensStats>>();
+  async loadSparks(ns: string) {
+    return (this.sparks.get(ns) ?? []).map((s) => ({ ...s }));
+  }
+  async appendSparks(ns: string, entries: ArchivedSpark[]) {
+    this.sparks.set(ns, [...(this.sparks.get(ns) ?? []), ...entries]);
+  }
+  async loadLensStats(ns: string) {
+    return { ...(this.lenses.get(ns) ?? {}) };
+  }
+  async saveLensStats(ns: string, stats: Record<string, LensStats>) {
+    this.lenses.set(ns, { ...stats });
+  }
+}
+
+/** One namespace's memory for one run, over any store. */
+export class Archive {
+  sparks: ArchivedSpark[] = [];
+  lenses: Record<string, LensStats> = {};
+  private readonly store: MemoryStore;
+
+  constructor(private readonly namespace: string, store: MemoryStore | string = new FileMemoryStore()) {
+    this.store = typeof store === "string" ? new FileMemoryStore(store) : store;
+  }
+
+  async load(embedder: Embedder): Promise<void> {
+    this.sparks = await this.store.loadSparks(this.namespace);
+    const stale = this.sparks.filter((s) => s.embedder !== embedder.id || !Array.isArray(s.vector) || !s.vector.length);
     if (stale.length) {
       const vecs = await embedder.embed(stale.map((s) => s.text));
       stale.forEach((s, i) => {
@@ -63,11 +127,7 @@ export class Archive {
         s.embedder = embedder.id;
       });
     }
-    try {
-      this.lenses = JSON.parse(await readFile(path.join(this.dir, "lenses.json"), "utf8"));
-    } catch {
-      this.lenses = {};
-    }
+    this.lenses = await this.store.loadLensStats(this.namespace);
   }
 
   vectors(): number[][] {
@@ -77,13 +137,13 @@ export class Archive {
   async remember(entries: Omit<ArchivedSpark, "ts">[]): Promise<void> {
     if (!entries.length) return;
     const ts = new Date().toISOString();
-    const lines = entries.map((e) => JSON.stringify({ ...e, ts })).join("\n") + "\n";
-    await appendFile(path.join(this.dir, "sparks.jsonl"), lines);
-    this.sparks.push(...entries.map((e) => ({ ...e, ts })));
+    const full = entries.map((e) => ({ ...e, ts }));
+    await this.store.appendSparks(this.namespace, full);
+    this.sparks.push(...full);
   }
 
   async saveLensStats(): Promise<void> {
-    await writeFile(path.join(this.dir, "lenses.json"), JSON.stringify(this.lenses, null, 2));
+    await this.store.saveLensStats(this.namespace, this.lenses);
   }
 }
 

@@ -29,43 +29,6 @@ export class CachedEmbedder implements Embedder {
   }
 }
 
-/**
- * Local sentence embeddings (all-MiniLM-L6-v2, quantized) via transformers.js.
- * No API key; the model downloads once from Hugging Face (about 23 MB) and is cached.
- */
-export class LocalEmbedder implements Embedder {
-  readonly id: string;
-  private extractor: Promise<(texts: string[], opts: object) => Promise<{ tolist(): number[][] }>> | null = null;
-
-  constructor(private readonly model = "Xenova/all-MiniLM-L6-v2") {
-    this.id = `local:${model}`;
-  }
-
-  private load() {
-    if (!this.extractor) {
-      this.extractor = (async () => {
-        const mod = (await import("@huggingface/transformers")) as unknown as {
-          pipeline: (task: string, model: string, opts: object) => Promise<never>;
-        };
-        return mod.pipeline("feature-extraction", this.model, { dtype: "q8" });
-      })();
-    }
-    return this.extractor;
-  }
-
-  async embed(texts: string[]): Promise<number[][]> {
-    if (texts.length === 0) return [];
-    const extract = await this.load();
-    const out: number[][] = [];
-    for (let i = 0; i < texts.length; i += 32) {
-      const batch = texts.slice(i, i + 32);
-      const t = await extract(batch, { pooling: "mean", normalize: true });
-      out.push(...t.tolist());
-    }
-    return out;
-  }
-}
-
 const STOP = new Set(
   "a an the and or but of to in on for with by from at as is are be been was were it its this that these those into via using use uses your their our we you they them can will would should could may might not no more most less very just than then so such each any all some one two new".split(
     " ",
@@ -122,22 +85,35 @@ function hash(s: string): number {
 }
 
 /**
- * Picks the best available embedder. DIVERGENT_EMBEDDER=lexical forces the fallback.
- * If the local model fails to load, the run continues on the lexical embedder and says so.
+ * OpenAI text-embedding-3-small over HTTPS. Used where a local model cannot run
+ * (serverless hosts such as Control Center, whose function size limit rules out the
+ * local runtime). The key is passed in by the host, never read from a file.
  */
-export async function createEmbedder(
-  preference: string | undefined = process.env.DIVERGENT_EMBEDDER,
-  onWarning?: (msg: string) => void,
-): Promise<Embedder> {
-  if (preference === "lexical") return new CachedEmbedder(new LexicalEmbedder());
-  const local = new LocalEmbedder(preference && preference !== "local" ? preference : undefined);
-  try {
-    await local.embed(["warmup"]);
-    return new CachedEmbedder(local);
-  } catch (err) {
-    onWarning?.(
-      `Local embedding model unavailable (${(err as Error).message}). Falling back to lexical distance, which cannot see paraphrase.`,
-    );
-    return new CachedEmbedder(new LexicalEmbedder());
+export class OpenAIEmbedder implements Embedder {
+  readonly id: string;
+  constructor(
+    private readonly key: string,
+    private readonly model = "text-embedding-3-small",
+    private readonly fetcher: typeof fetch = fetch,
+  ) {
+    this.id = `openai:${model}`;
+  }
+
+  async embed(texts: string[]): Promise<number[][]> {
+    if (!texts.length) return [];
+    const out: number[][] = [];
+    for (let i = 0; i < texts.length; i += 96) {
+      const batch = texts.slice(i, i + 96).map((t) => t.trim().slice(0, 6000) || " ");
+      const r = await this.fetcher("https://api.openai.com/v1/embeddings", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${this.key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: this.model, input: batch }),
+      });
+      if (!r.ok) throw new Error(`openai embeddings failed: ${r.status}`);
+      const data = (await r.json()) as { data: Array<{ index: number; embedding: number[] }> };
+      const sorted = data.data.slice().sort((a, b) => a.index - b.index);
+      out.push(...sorted.map((d) => d.embedding));
+    }
+    return out;
   }
 }

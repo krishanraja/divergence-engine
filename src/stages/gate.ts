@@ -19,24 +19,42 @@ export interface Calibration {
   spread: number;
   gravityThreshold: number;
   duplicateThreshold: number;
+  /** False when the gate factors were not measured for this embedder. */
+  calibrated?: boolean;
 }
 
 /**
- * Measured, not guessed (bench/calibrate.mts, MiniLM, three problems, 15 rewordings,
- * 15 non-obvious ideas): rewordings of consensus answers land at 0.22 to 0.77 spreads,
- * genuinely non-obvious on-topic ideas at 0.83 to 1.10. Balanced sits in that gap.
- * Grounded admits borderline ideas and lets the judge decide; wild demands more distance.
+ * Gate factors per embedder, measured with `npm run calibrate` (src/calibration.ts),
+ * never guessed. MiniLM, three problems, 15 rewordings and 15 non-obvious ideas:
+ * rewordings land at up to 0.77 spreads, non-obvious ideas from 0.83. Balanced sits
+ * in that gap; grounded admits borderline ideas and lets the judge decide; wild
+ * demands more distance. An embedder with no measured row runs on the MiniLM factors
+ * and reports `calibrated: false`, which a host can refuse to generate on.
  */
-const GRAVITY_FACTOR: Record<Temperament, number> = {
-  grounded: 0.75,
-  balanced: 0.8,
-  wild: 0.9,
+export const GATE_FACTORS: Record<string, Record<Temperament, number>> = {
+  "local:Xenova/all-MiniLM-L6-v2": { grounded: 0.75, balanced: 0.8, wild: 0.9 },
 };
+
+const DEFAULT_FACTORS: Record<Temperament, number> = GATE_FACTORS["local:Xenova/all-MiniLM-L6-v2"]!;
+
+/** The factors for an embedder, and whether they were measured for it. */
+export function gateFactorsFor(embedderId?: string, override?: Partial<Record<Temperament, number>>) {
+  const measured = embedderId ? GATE_FACTORS[embedderId] : undefined;
+  const base = measured ?? DEFAULT_FACTORS;
+  const factors = { ...base, ...(override ?? {}) };
+  return { factors, calibrated: !!measured || !!(override && Object.keys(override).length) };
+}
 
 /** Used only when there are fewer than two wells to measure a spread from. */
 const FALLBACK_SPREAD = 0.35;
 
-export function calibrate(wellVectors: number[][], temperament: Temperament): Calibration {
+export function calibrate(
+  wellVectors: number[][],
+  temperament: Temperament,
+  override?: Partial<Record<Temperament, number>>,
+  embedderId?: string,
+): Calibration {
+  const { factors, calibrated } = gateFactorsFor(embedderId, override);
   let spread = FALLBACK_SPREAD;
   if (wellVectors.length >= 2) {
     const nn = wellVectors.map((v, i) => {
@@ -50,8 +68,9 @@ export function calibrate(wellVectors: number[][], temperament: Temperament): Ca
   }
   return {
     spread,
-    gravityThreshold: spread * GRAVITY_FACTOR[temperament],
+    gravityThreshold: spread * factors[temperament],
     duplicateThreshold: spread * 0.5,
+    calibrated,
   };
 }
 

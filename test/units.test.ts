@@ -155,3 +155,36 @@ test("a role roster rotates models call by call on the wire", async () => {
   assert.deepEqual(seen, ["claude-opus-5-5", "claude-sonnet-5-5", "claude-opus-5-5"]);
   assert.deepEqual(resolveRoleModels({ model: "m1" }).judge, ["m1"]);
 });
+
+test("gate factors: measured embedders are calibrated, unknown ones are flagged, overrides count as measured", async () => {
+  const { gateFactorsFor } = await import("../src/stages/gate.js");
+  assert.equal(gateFactorsFor("local:Xenova/all-MiniLM-L6-v2").calibrated, true);
+  const unknown = gateFactorsFor("openai:text-embedding-3-small");
+  assert.equal(unknown.calibrated, false);
+  assert.equal(unknown.factors.balanced, 0.8);
+  const over = gateFactorsFor("openai:text-embedding-3-small", { balanced: 0.6 });
+  assert.equal(over.calibrated, true);
+  assert.equal(over.factors.balanced, 0.6);
+});
+
+test("core entry pulls in neither the Anthropic SDK nor the local model", async () => {
+  const { readFileSync } = await import("node:fs");
+  const seen = new Set<string>();
+  const walk = (file: string) => {
+    if (seen.has(file)) return;
+    seen.add(file);
+    const src = readFileSync(file, "utf8");
+    for (const m of src.matchAll(/from "(\.[^"]+)"/g)) walk(new URL(m[1]!.replace(/\.js$/, ".ts"), `file://${file}`).pathname);
+    assert.ok(!/@anthropic-ai\/sdk|@huggingface\/transformers/.test(src.replace(/^\s*(\/\/|\*).*$/gm, "")), `${file} imports a heavy runtime`);
+  };
+  walk(new URL("../src/core.ts", import.meta.url).pathname);
+  assert.ok(seen.size > 5);
+});
+
+test("runCalibration measures the lexical fallback and reports it honestly", async () => {
+  const { runCalibration } = await import("../src/calibration.js");
+  const r = await runCalibration(new LexicalEmbedder());
+  assert.equal(r.embedder, "lexical:hash-1024");
+  assert.equal(typeof r.separable, "boolean");
+  assert.ok(r.byTemperament.balanced.total === 15);
+});

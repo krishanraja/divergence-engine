@@ -26,7 +26,7 @@ import path from "node:path";
 import { z } from "zod";
 import { DivergentEngine } from "../src/engine.js";
 import { AnthropicProvider } from "../src/llm/anthropic.js";
-import { createEmbedder } from "../src/embed/embedder.js";
+import { createEmbedder } from "../src/embed/local.js";
 import { mean } from "../src/util.js";
 import { LENSES } from "../src/lenses.js";
 import { IdeasSchema, divergePrompt } from "../src/prompts.js";

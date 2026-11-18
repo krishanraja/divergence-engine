@@ -183,6 +183,8 @@ export interface RunOptions {
   crossPollinate?: boolean;
   /** Hard ceiling on model calls for this run. */
   maxCalls?: number;
+  /** Milliseconds the run may take. Stages stop starting as it runs out. Unset means no limit. */
+  timeBudgetMs?: number;
   /** Seed for stimulus, lens and ordering randomness. */
   seed?: number;
   /** Persist selected sparks to the namespace archive so they are never repeated. */

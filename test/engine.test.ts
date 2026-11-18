@@ -167,3 +167,32 @@ test("an idea missing any of its four parts is rejected, never selected", async 
   assert.equal(r.sparks.length, 0);
   assert.equal(r.stats.rejected.rejected_incomplete, 1);
 });
+
+test("a time budget stops generation early and still returns a report", async () => {
+  const provider = scriptedProvider();
+  const slow = (provider as unknown as { handlers: Record<string, (...a: unknown[]) => unknown> }).handlers;
+  const diverge = slow.diverge!;
+  let calls = 0;
+  slow.diverge = (...a: unknown[]) => {
+    calls++;
+    const until = Date.now() + 60;
+    while (Date.now() < until) {
+      /* simulate a slow call */
+    }
+    return diverge(...a);
+  };
+  const engine = new DivergentEngine({ provider, embedder: embedder(), archiveRoot: await tempHome() });
+  const r = await engine.run({ problem: "bakery", seed: 8, timeBudgetMs: 200, maxWaves: 5, lensesPerWave: 1, remember: false });
+  assert.match(r.stats.stopReason, /time budget/);
+  assert.ok(calls < 5, `generated ${calls} waves inside a 200ms budget`);
+});
+
+test("a supplied memory store replaces the files, and memory persists across engines that share it", async () => {
+  const { MemoryOnlyStore } = await import("../src/archive.js");
+  const store = new MemoryOnlyStore();
+  const a = new DivergentEngine({ provider: scriptedProvider(), embedder: embedder(), store });
+  await a.record({ namespace: "growth-mindmake", items: ["Ask leaders to correct a dated prediction about their company"] });
+  const b = new DivergentEngine({ provider: scriptedProvider(), embedder: embedder(), store });
+  const res = await b.score({ problem: "meetings", obvious: OBVIOUS, namespace: "growth-mindmake", ideas: ["Ask leaders to correct a dated prediction about their company"] });
+  assert.equal(res.results[0]!.repeatsArchive, true);
+});

@@ -147,7 +147,10 @@ report = consult("score", {"problem": "...", "obvious": [...], "ideas": [...], "
 ### From TypeScript
 
 ```ts
+// Everything, with the local embedding model and the Anthropic SDK:
 import { createEngine } from "divergent-thinker";
+// Or the core alone, for a serverless host that supplies its own model provider,
+// embedder and memory store: import { DivergentEngine } from "divergent-thinker/core";
 const engine = await createEngine();
 const { sparks } = await engine.provoke({ problem, namespace: "content-engine-ideas", target: "writing" });
 ```

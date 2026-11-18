@@ -1,4 +1,4 @@
-import { Archive, LensBandit } from "./archive.js";
+import { Archive, FileMemoryStore, LensBandit, type MemoryStore } from "./archive.js";
 import type { Embedder } from "./embed/embedder.js";
 import { LENSES, lensByName } from "./lenses.js";
 import { BudgetExceededError, MeteredProvider, type LLMProvider } from "./llm/provider.js";
@@ -38,8 +38,12 @@ import { clamp, createRng, distance, ideaText, mapLimit, mean, shortId, shuffle 
 export interface EngineDeps {
   provider: LLMProvider;
   embedder: Embedder;
-  /** Archive root override, mainly for tests. */
+  /** Archive root for the default file store, mainly for tests. Ignored when `store` is given. */
   archiveRoot?: string;
+  /** Where namespace memory lives. Default: files under DIVERGENT_HOME. */
+  store?: MemoryStore;
+  /** Gate factors measured for this host's embedder (`runCalibration`), overriding the built-in table. */
+  gateFactors?: Partial<Record<Temperament, number>>;
   /** Parallel model calls. Default 4. */
   concurrency?: number;
 }
@@ -93,7 +97,10 @@ class Run {
 }
 
 export class DivergentEngine {
-  constructor(private readonly deps: EngineDeps) {}
+  private readonly store: MemoryStore;
+  constructor(private readonly deps: EngineDeps) {
+    this.store = deps.store ?? new FileMemoryStore(deps.archiveRoot);
+  }
 
   /**
    * Full pipeline: map the consensus, diverge through lenses in waves, gate for novelty,
@@ -105,10 +112,15 @@ export class DivergentEngine {
     const seed = options.seed ?? Math.floor(Math.random() * 2 ** 31);
     const rng = createRng(seed);
     const emit = options.onEvent ?? (() => {});
+    // A time budget keeps a run inside a host's limit (a serverless function's maximum
+    // duration). Generation stops first, then the dialectic, then the hybrid; judging
+    // runs unless almost nothing is left. Unset means no limit.
+    const budgetMs = options.timeBudgetMs;
+    const past = (share: number) => budgetMs !== undefined && Date.now() - started > budgetMs * share;
     const run = new Run(rng, emit);
     const llm = new MeteredProvider(this.deps.provider, opts.maxCalls);
     const embedder = this.deps.embedder;
-    const archive = new Archive(opts.namespace, this.deps.archiveRoot);
+    const archive = new Archive(opts.namespace, this.store);
     await archive.load(embedder);
     run.archive = archive.vectors();
     const bandit = new LensBandit(archive.lenses, rng);
@@ -120,7 +132,7 @@ export class DivergentEngine {
     run.consensus = await this.probe(llm, opts.problem, opts.context);
     const wellTexts = [...run.consensus.obvious, ...(opts.cliches ?? [])];
     run.wells = await embedder.embed(wellTexts);
-    run.calibration = calibrate(run.wells, opts.temperament);
+    run.calibration = calibrate(run.wells, opts.temperament, this.deps.gateFactors, embedder.id);
 
     // Reserve budget for the convergent half of the pipeline before spending on waves.
     const judgeCallsEstimate = opts.judgePasses * Math.ceil(Math.max(opts.count * 3, 1) / JUDGE_CHUNK);
@@ -133,6 +145,10 @@ export class DivergentEngine {
     for (; wave < opts.maxWaves; wave++) {
       const accepted = run.accepted();
       if (accepted.length >= poolTarget) break;
+      if (past(0.5)) {
+        stopReason = "time budget: generation stopped at half the budget";
+        break;
+      }
       const affordable = llm.remaining - reserve;
       if (affordable < 1) {
         stopReason = "budget reserved for dialectic and judging";
@@ -209,6 +225,10 @@ export class DivergentEngine {
     // Stage 3: dialectic. Attack the most remote survivors, then mutate under a regression guard.
     try {
       for (let round = 0; round < opts.dialecticRounds; round++) {
+        if (past(0.7)) {
+          run.warn("time budget: dialectic skipped");
+          break;
+        }
         const beam = run
           .accepted()
           .filter((n) => n.kind !== "counter" && !run.attacked.has(n.id))
@@ -225,7 +245,8 @@ export class DivergentEngine {
 
     // Stage 4: blind judging with shuffled passes, then the usefulness floor.
     emit({ type: "stage", stage: "judge" });
-    await this.judge(run, llm, opts.problem, run.accepted(), opts.judgePasses);
+    if (past(0.92)) run.warn("time budget: judging skipped; ranked on remoteness only");
+    else await this.judge(run, llm, opts.problem, run.accepted(), past(0.8) ? 1 : opts.judgePasses);
     const floor = USEFULNESS_FLOOR[opts.temperament];
     for (const n of run.accepted()) {
       if (n.judge && n.judge.usefulness < floor) {
@@ -238,7 +259,7 @@ export class DivergentEngine {
     // Stage 5: portfolio selection, then one cross-pollinated hybrid if it earns a place.
     emit({ type: "stage", stage: "select" });
     let portfolio = this.select(run, opts.count);
-    if (opts.crossPollinate && portfolio.length >= 2 && llm.remaining >= 2) {
+    if (opts.crossPollinate && portfolio.length >= 2 && llm.remaining >= 2 && !past(0.85)) {
       try {
         const hybrid = await this.crossPollinate(run, llm, embedder, opts, portfolio);
         if (hybrid) portfolio = this.select(run, opts.count);
@@ -350,8 +371,8 @@ export class DivergentEngine {
     const llm = new MeteredProvider(this.deps.provider, 4);
     const consensus = args.obvious?.length ? { obvious: args.obvious, orthodoxies: [] } : await this.probe(llm, args.problem);
     const wells = await embedder.embed(consensus.obvious);
-    const cal = calibrate(wells, temperament);
-    const archive = new Archive(args.namespace ?? "default", this.deps.archiveRoot);
+    const cal = calibrate(wells, temperament, this.deps.gateFactors, embedder.id);
+    const archive = new Archive(args.namespace ?? "default", this.store);
     await archive.load(embedder);
     const drafts: IdeaDraft[] = args.ideas.map((i) =>
       typeof i === "string" ? { title: i.slice(0, 80), mechanism: i, whyNonObvious: "", firstStep: "" } : i,
@@ -408,7 +429,7 @@ export class DivergentEngine {
    */
   async record(args: { namespace: string; items: Array<string | { title: string; mechanism?: string }>; label?: string }) {
     const embedder = this.deps.embedder;
-    const archive = new Archive(args.namespace, this.deps.archiveRoot);
+    const archive = new Archive(args.namespace, this.store);
     await archive.load(embedder);
     const items = args.items
       .map((i) => (typeof i === "string" ? { title: i.slice(0, 80), mechanism: i } : { title: i.title, mechanism: i.mechanism ?? i.title }))
@@ -450,9 +471,9 @@ export class DivergentEngine {
       })
     ).data;
     const wells = await embedder.embed(consensus.obvious);
-    const cal = calibrate(wells, "balanced");
+    const cal = calibrate(wells, "balanced", this.deps.gateFactors, embedder.id);
     const [vOrig, vMut, vCounter] = await embedder.embed([ideaText(idea), ideaText(mut.idea), ideaText(attack.counterIdea)]);
-    const archive = new Archive(args.namespace ?? "default", this.deps.archiveRoot);
+    const archive = new Archive(args.namespace ?? "default", this.store);
     await archive.load(embedder);
     const measure = (v: number[]) =>
       gate({ vector: v, text: "", wells, archive: archive.vectors(), peers: [], bannedWords: [], calibration: cal }).metrics;
@@ -753,12 +774,12 @@ export class DivergentEngine {
     const llm = new MeteredProvider(this.deps.provider, 2);
     const embedder = this.deps.embedder;
     const namespace = options.namespace ?? "default";
-    const archive = new Archive(namespace, this.deps.archiveRoot);
+    const archive = new Archive(namespace, this.store);
     await archive.load(embedder);
     run.archive = archive.vectors();
     run.consensus = await this.probe(llm, options.problem, options.context);
     run.wells = await embedder.embed([...run.consensus.obvious, ...(options.cliches ?? [])]);
-    run.calibration = calibrate(run.wells, "balanced");
+    run.calibration = calibrate(run.wells, "balanced", this.deps.gateFactors, embedder.id);
     const drafts = await generate(run, llm);
     for (const d of drafts) {
       const n = await this.admit(run, embedder, { kind: "seed", parents: ["root"], lens: d.lens, wave: 1, idea: d.idea, bannedWords: options.bannedWords ?? [] });
