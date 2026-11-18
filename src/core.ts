@@ -6,6 +6,7 @@
 export { DivergentEngine, type EngineDeps } from "./engine.js";
 export { MeteredProvider, BudgetExceededError, RefusalError, type LLMProvider, type Role, type Effort, type StructuredRequest, type StructuredResponse, type CallUsage } from "./llm/provider.js";
 export { ScriptedProvider } from "./llm/scripted.js";
+export { toStrictJsonSchema } from "./llm/jsonSchema.js";
 export { CachedEmbedder, LexicalEmbedder, OpenAIEmbedder, type Embedder } from "./embed/embedder.js";
 export { Archive, FileMemoryStore, MemoryOnlyStore, LensBandit, divergentHome, type MemoryStore, type ArchivedSpark, type LensStats } from "./archive.js";
 export { LENSES, type Lens } from "./lenses.js";

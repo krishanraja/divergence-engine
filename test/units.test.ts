@@ -188,3 +188,13 @@ test("runCalibration measures the lexical fallback and reports it honestly", asy
   assert.equal(typeof r.separable, "boolean");
   assert.ok(r.byTemperament.balanced.total === 15);
 });
+
+test("toStrictJsonSchema closes every object and requires every field", async () => {
+  const { toStrictJsonSchema } = await import("../src/llm/jsonSchema.js");
+  const { AttackSchema } = await import("../src/prompts.js");
+  const js = toStrictJsonSchema(AttackSchema) as any;
+  assert.equal(js.$schema, undefined);
+  assert.equal(js.additionalProperties, false);
+  assert.deepEqual(js.required.sort(), ["conventionalTwin", "counterIdea", "fatalFlaw"]);
+  assert.equal(js.properties.counterIdea.additionalProperties, false);
+});
