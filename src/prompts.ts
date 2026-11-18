@@ -133,6 +133,8 @@ Synthesize a stronger idea. Requirements:
 - Answer the fatal flaw with a mechanism, not a caveat.
 - Move further away from "${twin}" and from these conventional answers, never closer:
 ${avoid.map((a) => `  - ${a}`).join("\n")}
+- Make one binding decision about the mechanism. Do not hedge between the thesis and the objection, and do not list options.
+- State the precise condition under which the objection would still win, so the reader knows where the idea breaks.
 A synthesis that splits the difference with the conventional answer is a failure. If the only way to fix the flaw is to become conventional, keep the thesis mechanism and patch the flaw narrowly.`,
   };
 }

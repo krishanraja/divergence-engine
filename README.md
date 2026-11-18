@@ -56,15 +56,17 @@ The lexical fallback embedder (used only if the local model cannot load) catches
 
 Geometric on purpose: a remote but useless idea, or a useful but conventional one, cannot be rescued by excelling on one axis. Temperament changes the weights and the usefulness floor: `grounded` weights usefulness, `wild` weights originality and remoteness.
 
-## What I kept from the reference repos, and what I did not
+## What the reference repos actually do, and what this engine takes from them
 
-| Repo | Kept | Changed or rejected, and why |
-|---|---|---|
-| `nachosystems/deep-thinker` | Thought DAG with branching, merging and cross-edges; strategy menu; switching strategy on stagnation; MCP surface. | Strategy switching is a Thompson-sampling bandit that learns per namespace across runs, instead of fixed rules. |
-| `Skytliang/Multi-Agents-Debate` | Separate proposer and adversary roles to break single-model fixation. | One attack round by default instead of open-ended tit-for-tat: most of the gain is in the first round, and every extra round costs calls. The adversary's rival idea becomes a candidate node, so debate generates as well as filters. |
-| `FradSer/dialectica` | Thesis, antithesis, synthesis over a beam of survivors. | Added the regression guard. Unguarded synthesis converges on the consensus, which is the opposite of what a divergence engine is for. |
-| `massivetexts/llm_aut_study` | Its finding that LLM judges track human originality ratings, and its rubric style. | Did **not** ship its fine-tuned scorer. It was trained on Alternate Uses Task answers ("uses for a brick"), so applying it to strategy, code or video concepts is out of distribution. The engine uses a prompted judge with consensus answers as calibration anchors, plus usefulness and specificity, which AUT originality alone ignores. |
-| `lechmazur/divergent` | Pairwise semantic distance and non-repetition against prior outputs. | Thresholds are self-calibrated per run, and "prior outputs" is a persistent per-namespace archive, so a consuming engine is never handed the same idea twice. |
+Each repo was cloned and read at the source level (README, core modules, prompts, and published findings). Several descriptions in the original architecture brief did not match the code, and those corrections changed the design.
+
+| Repo | What it actually is | What this engine takes | Where the brief was wrong |
+|---|---|---|---|
+| `nachosystems/deep-thinker` (published as `hubinoretros/deep-thinker`) | A TypeScript MCP server that stores a thought DAG and ten strategy schemas. It makes **no model calls**: the host model does the thinking. Stagnation is detected when self-reported confidence stops improving (`src/core/metacog.ts`). | The DAG with parents and cross-edges, the strategy menu, and switching strategy on stagnation. | The brief described stagnation as "depth without semantic variance". Here stagnation is measured directly as the share of a lens's ideas that survive the gate, and a Thompson-sampling bandit learns lens yield per namespace across runs. |
+| `Skytliang/Multi-Agents-Debate` | A **convergence** framework: an affirmative and a negative debater plus a moderator who ends the debate early once one side clearly wins, up to three rounds, aimed at counterintuitive QA and translation (`code/debate4tran.py`, `config4all.json`). | Its diagnosis of degeneration of thought, and the remedy of a separate agent whose job is to disagree. | MAD is built to reach one correct answer, not to widen the option set. The engine uses one attack per thesis and turns the adversary's rival proposal into a candidate idea of its own. |
+| `FradSer/dialectica` | An evaluated reasoning-workflow toolbox. Its own ablations found that ToT+GAN beam search, the ensemble scorer, and an untuned dialectic spiral **tied or lost to a prompt-matched single call** on self-contained tasks. On open-ended tasks the gain came from **mixing heterogeneous models**, and the dialectic only won (three tasks, one judge) once its synthesis prompt was sharpened to make one binding decision (README findings 2, 3, 5, 7 and 9). | Three things, all from its evidence: the benchmark control is a prompt-matched single call, not a naive prompt; the synthesis prompt makes one binding decision and names where the objection still wins; and any role can rotate through a roster of models. | The brief presented dialectica's tree search and GAN critic as the refinement layer. Its author demoted exactly those components. The dialectic stage here should be treated as unproven until `npm run bench` says otherwise. |
+| `massivetexts/llm_aut_study` | Notebooks for Organisciak et al. (2022). Models fine-tuned on 27,000 human-rated **Alternate Uses Task** responses reached r = 0.81 with human raters. **Semantic distance reached only r = 0.12 to 0.26.** Learning transferred to new AUT items, sometimes with no training at all. | A prompted LLM judge on an AUT-style originality rubric, with the consensus answers as anchors for a score of 1. | The scorer itself is AUT-specific (uses for everyday objects), so it is not shipped. More importantly, the paper's own numbers say embedding distance is a weak stand-in for originality. Here distance only gates rewordings, which calibration shows it does well; originality is the judge's job, and the score is geometric so neither signal can carry an idea alone. |
+| `lechmazur/divergent` | A word-level benchmark: generate 25 words unrelated to each other and to 50 given words. Every pair is rated for relatedness 0 to 10 by **four LLM judges**, not embeddings; each word scores by its minimum divergence from the others; rule-following and repeats across 88 prompts are tracked separately. | Scoring an item by its nearest neighbour (minimum divergence), an explicit anchor list to stay away from, and tracking repetition across runs (the namespace archive). | The brief described cosine distance. The benchmark uses LLM judges because they catch connections embeddings miss (wordplay, sound, theme). The engine uses embeddings for speed, so the adversary's "conventional twin" check is the LLM backstop for disguised consensus answers. |
 
 ## Interfaces
 
@@ -119,7 +121,7 @@ const report = await engine.run({ problem, namespace: "content-engine", target: 
 |---|---|---|
 | `ANTHROPIC_API_KEY` | none | Required for any call that generates. Scoring with a supplied consensus needs no key. |
 | `DIVERGENT_MODEL` | `claude-opus-5-5` | Model for every role. |
-| `DIVERGENT_MODEL_<ROLE>` | | Per-role override: `PROBE`, `DIVERGE`, `ADVERSARY`, `SYNTHESIZE`, `JUDGE`, `BLEND`, `PROVOKE`. |
+| `DIVERGENT_MODEL_<ROLE>` | | Per-role override: `PROBE`, `DIVERGE`, `ADVERSARY`, `SYNTHESIZE`, `JUDGE`, `BLEND`, `PROVOKE`. A comma-separated list is a roster the role rotates through, e.g. `DIVERGENT_MODEL_DIVERGE=claude-opus-5-5,claude-sonnet-5-5`. |
 | `DIVERGENT_EMBEDDER` | `local` | `local` (MiniLM, downloads about 23 MB once), `lexical`, or a Hugging Face model id. |
 | `DIVERGENT_HOME` | `~/.divergent` | Per-namespace memory: handed-out ideas and lens statistics. |
 | `DIVERGENT_DISABLE_FALLBACKS` | | `1` turns off server-side refusal fallbacks. |
@@ -134,19 +136,20 @@ Run options (MCP, HTTP, library): `count`, `temperament` (`grounded` / `balanced
 | Check | Status |
 |---|---|
 | Typecheck and build | Pass |
-| 20 unit and pipeline tests with a scripted model (gate, regression guard, budget ceiling, usefulness floor, namespace memory, provoke, score, challenge, bandit, MMR) | Pass |
+| 21 unit and pipeline tests with a scripted model (gate, regression guard, budget ceiling, usefulness floor, namespace memory, provoke, score, challenge, bandit, MMR) | Pass |
 | Gate calibration with the real embedder (`npm run calibrate`) | Pass, table above |
 | MCP server over stdio: tool listing, zero-call scoring, clean error without a key | Pass |
 | HTTP server: health, auth, validation, zero-call scoring | Pass |
 | Anthropic request shape (model, effort, structured output schema, refusal fallbacks, prompt caching, no sampling params), checked against a captured request | Pass |
-| **Live A/B benchmark against a plain "be creative" prompt** (`npm run bench`) | **Not run.** No API key in the build environment. Pass signal is set in advance in `bench/bench.mts`: the engine must beat the baseline on mean divergence score and share outside the consensus on most problems, without losing more than 0.5 judged usefulness. |
+| Model roster rotation, checked on the wire | Pass |
+| **Live benchmark against a prompt-matched single call** (`npm run bench`) | **Not run.** No API key in the build environment. Three arms (naive prompt, prompt-matched strong single call, engine), scored on one yardstick with pooled blind judging. Pass signal is set in advance in `bench/bench.mts`: the engine must beat the **strong** arm on mean divergence score and share outside the consensus on most problems, without losing more than 0.5 judged usefulness. |
 
-Until the benchmark runs, the claim that the engine beats a single prompt is a hypothesis with a defined test, not a result.
+Until the benchmark runs, the claim that the engine beats a single call is a hypothesis with a defined test, not a result. dialectica's evidence makes a loss to the strong arm a real possibility. If that happens, the ranked fallbacks are: switch the generator to a heterogeneous roster, then cut the dialectic stage, then keep only `provoke` and `score_divergence`.
 
 ## Development
 
 ```bash
 npm test            # scripted model, no spend
 npm run calibrate   # real embedder, no spend
-npm run bench       # live, spends tokens
+npm run bench       # live, spends tokens: naive vs prompt-matched single call vs engine
 ```

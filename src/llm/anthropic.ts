@@ -22,8 +22,12 @@ const PRICES: Record<string, { input: number; output: number }> = {
 export interface AnthropicProviderOptions {
   /** Model for every role unless overridden. Default claude-opus-5-5. */
   model?: string;
-  /** Per-role model overrides, e.g. a cheaper judge. */
-  roleModels?: Partial<Record<Role, string>>;
+  /**
+   * Per-role model overrides, e.g. a cheaper judge. An array is a roster: calls for that
+   * role rotate through it. dialectica's ablations found roster heterogeneity, not
+   * scoring or adversarial steps, was the lever behind its open-ended quality gains.
+   */
+  roleModels?: Partial<Record<Role, string | string[]>>;
   /** Per-role effort overrides. */
   roleEffort?: Partial<Record<Role, Effort>>;
   /** Opt out of server-side refusal fallbacks. */
@@ -46,15 +50,20 @@ const DEFAULT_EFFORT: Record<Role, Effort> = {
 };
 
 /**
- * Builds the role-to-model map from options plus environment.
+ * Builds the role-to-model roster from options plus environment.
  * DIVERGENT_MODEL sets every role; DIVERGENT_MODEL_<ROLE> (e.g. DIVERGENT_MODEL_JUDGE) overrides one.
+ * A comma-separated value is a roster, e.g. DIVERGENT_MODEL_DIVERGE=claude-opus-5-5,claude-sonnet-5-5.
  */
-export function resolveRoleModels(opts: AnthropicProviderOptions = {}): Record<Role, string> {
+export function resolveRoleModels(opts: AnthropicProviderOptions = {}): Record<Role, string[]> {
   const base = opts.model ?? process.env.DIVERGENT_MODEL ?? "claude-opus-5-5";
   const roles: Role[] = ["probe", "diverge", "adversary", "synthesize", "judge", "blend", "provoke"];
-  const out = {} as Record<Role, string>;
+  const out = {} as Record<Role, string[]>;
+  const split = (v: string | string[]) =>
+    (Array.isArray(v) ? v : v.split(",")).map((m) => m.trim()).filter(Boolean);
   for (const r of roles) {
-    out[r] = opts.roleModels?.[r] ?? process.env[`DIVERGENT_MODEL_${r.toUpperCase()}`] ?? base;
+    const v = opts.roleModels?.[r] ?? process.env[`DIVERGENT_MODEL_${r.toUpperCase()}`] ?? base;
+    const roster = split(v);
+    out[r] = roster.length ? roster : [base];
   }
   return out;
 }
@@ -62,7 +71,8 @@ export function resolveRoleModels(opts: AnthropicProviderOptions = {}): Record<R
 export class AnthropicProvider implements LLMProvider {
   readonly name = "anthropic";
   private clientInstance: Anthropic | undefined;
-  private readonly models: Record<Role, string>;
+  private readonly models: Record<Role, string[]>;
+  private readonly cursor: Partial<Record<Role, number>> = {};
   private readonly effort: Record<Role, Effort>;
   private readonly fallbacks: boolean;
 
@@ -80,7 +90,10 @@ export class AnthropicProvider implements LLMProvider {
   }
 
   async structured<S extends z.ZodType>(req: StructuredRequest<S>): Promise<StructuredResponse<z.infer<S>>> {
-    const model = this.models[req.role];
+    const roster = this.models[req.role];
+    const i = this.cursor[req.role] ?? 0;
+    this.cursor[req.role] = i + 1;
+    const model = roster[i % roster.length]!;
     const params = {
       model,
       max_tokens: req.maxTokens ?? 16000,

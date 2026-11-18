@@ -128,3 +128,30 @@ test("ideaText never doubles a title that prefixes the mechanism", async () => {
   assert.equal(ideaText({ title: "Rent the ovens", mechanism: "Rent the ovens overnight" }), "Rent the ovens overnight");
   assert.equal(ideaText({ title: "Oven rental", mechanism: "Rent the ovens overnight" }), "Oven rental. Rent the ovens overnight");
 });
+
+test("a role roster rotates models call by call on the wire", async () => {
+  const { default: Anthropic } = await import("@anthropic-ai/sdk");
+  const { AnthropicProvider, resolveRoleModels } = await import("../src/llm/anthropic.js");
+  const seen: string[] = [];
+  const client = new Anthropic({
+    apiKey: "test",
+    fetch: (async (_url: unknown, init: { body: string }) => {
+      seen.push(JSON.parse(init.body).model);
+      return new Response(
+        JSON.stringify({
+          id: "m", type: "message", role: "assistant", model: "x", stop_reason: "end_turn", stop_sequence: null, stop_details: null,
+          content: [{ type: "text", text: JSON.stringify({ ok: true }) }],
+          usage: { input_tokens: 1, output_tokens: 1 },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as never,
+  });
+  const p = new AnthropicProvider({ client, roleModels: { diverge: "claude-opus-5-5, claude-sonnet-5-5" } });
+  const req = { role: "diverge" as const, system: "s", user: "u", schema: z.object({ ok: z.boolean() }) };
+  await p.structured(req);
+  await p.structured(req);
+  await p.structured(req);
+  assert.deepEqual(seen, ["claude-opus-5-5", "claude-sonnet-5-5", "claude-opus-5-5"]);
+  assert.deepEqual(resolveRoleModels({ model: "m1" }).judge, ["m1"]);
+});
