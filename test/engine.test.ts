@@ -132,3 +132,27 @@ test("same seed and same model replies give the same portfolio", async () => {
   const b = await runOnce();
   assert.equal(a.length, b.length);
 });
+
+test("record seeds namespace memory, and score flags repeats and banned words with zero calls", async () => {
+  const home = await tempHome();
+  const provider = scriptedProvider();
+  const engine = new DivergentEngine({ provider, embedder: embedder(), archiveRoot: home });
+  const shipped = "Bakers rent their ovens overnight to ceramic artists, firing pottery between bread batches";
+  const rec = await engine.record({ namespace: "growth-heartside", items: [shipped, shipped, "  "] });
+  assert.equal(rec.recorded, 1);
+  const again = await engine.record({ namespace: "growth-heartside", items: [shipped] });
+  assert.equal(again.recorded, 0);
+  assert.equal(again.skippedDuplicates, 1);
+  const res = await engine.score({
+    problem: "bakery",
+    obvious: OBVIOUS,
+    namespace: "growth-heartside",
+    bannedWords: ["synergy"],
+    ideas: [shipped, "A sourdough library where neighbours borrow starter cultures, creating synergy", "Night shift nurses co-own a starter culture and collect loaves from hospital lockers at 6am"],
+  });
+  assert.equal(provider.log.length, 0);
+  assert.equal(res.results[0]!.repeatsArchive, true);
+  assert.equal(res.results[0]!.status, "rejected_archive");
+  assert.equal(res.results[1]!.status, "rejected_anchor_word");
+  assert.equal(res.results[2]!.status, "accepted");
+});

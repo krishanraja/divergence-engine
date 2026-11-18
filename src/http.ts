@@ -6,7 +6,8 @@
  *   POST /provoke          body: { problem, ... }    -> compact report
  *   POST /map              body: { problem, context } -> consensus map
  *   POST /score            body: { problem, ideas, obvious?, judge? }
- *   POST /challenge        body: { problem, idea }
+ *   POST /challenge        body: { problem, idea, namespace? }
+ *   POST /record           body: { namespace, items: string[], label? }  (zero model calls)
  *   GET  /health
  *
  * Set DIVERGENT_TOKEN to require "Authorization: Bearer <token>". Binds to 127.0.0.1
@@ -46,8 +47,12 @@ const server = createServer(async (req, res) => {
     if (token && req.headers.authorization !== `Bearer ${token}`) return send(res, 401, { error: "unauthorized" });
     if (req.method !== "POST") return send(res, 405, { error: "POST only" });
     const b = await body(req);
-    if (typeof b.problem !== "string" || !b.problem.trim()) return send(res, 400, { error: "problem is required" });
     const e = await engine();
+    if (req.url === "/record") {
+      if (typeof b.namespace !== "string" || !Array.isArray(b.items)) return send(res, 400, { error: "namespace and items are required" });
+      return send(res, 200, await e.record(b as never));
+    }
+    if (typeof b.problem !== "string" || !b.problem.trim()) return send(res, 400, { error: "problem is required" });
     switch (req.url) {
       case "/diverge":
         return send(res, 200, compactReport(await e.run(b as never)));

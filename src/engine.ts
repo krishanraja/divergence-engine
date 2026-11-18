@@ -342,6 +342,8 @@ export class DivergentEngine {
     namespace?: string;
     judge?: boolean;
     temperament?: Temperament;
+    /** Words that flag an idea as rejected_anchor_word, e.g. a venture's kill list. */
+    bannedWords?: string[];
   }) {
     const embedder = this.deps.embedder;
     const temperament = args.temperament ?? "balanced";
@@ -364,19 +366,23 @@ export class DivergentEngine {
     }
     const results = drafts.map((idea, i) => {
       const others = vecs.filter((_, j) => j !== i);
-      const { metrics } = gate({
+      const { metrics, status } = gate({
         vector: vecs[i]!,
-        text: ideaText(idea),
+        text: `${ideaText(idea)} ${idea.whyNonObvious} ${idea.firstStep}`,
         wells,
         archive: archive.vectors(),
         peers: others,
-        bannedWords: [],
+        bannedWords: args.bannedWords ?? [],
         calibration: cal,
       });
       const judge = judged?.get(`i${i}`);
       return {
         title: idea.title,
+        /** The gate's verdict: accepted, or the first reason it would be rejected. */
+        status,
         outsideConsensus: metrics.wellDistance >= cal.gravityThreshold,
+        /** True when this namespace has already shipped or been handed something this close. */
+        repeatsArchive: metrics.archiveDistance < cal.duplicateThreshold,
         metrics,
         judge,
         score: divergenceScore(metrics, judge, temperament),
@@ -396,10 +402,38 @@ export class DivergentEngine {
   }
 
   /**
+   * Record outputs a consuming engine actually shipped (posts, hooks, plays), so later
+   * runs in that namespace treat them as already used. Zero model calls.
+   * Send de-identified text only: the archive is plain files on the host running the engine.
+   */
+  async record(args: { namespace: string; items: Array<string | { title: string; mechanism?: string }>; label?: string }) {
+    const embedder = this.deps.embedder;
+    const archive = new Archive(args.namespace, this.deps.archiveRoot);
+    await archive.load(embedder);
+    const items = args.items
+      .map((i) => (typeof i === "string" ? { title: i.slice(0, 80), mechanism: i } : { title: i.title, mechanism: i.mechanism ?? i.title }))
+      .filter((i) => i.mechanism.trim());
+    const texts = items.map(ideaText);
+    const existing = new Set(archive.sparks.map((s) => s.text));
+    const fresh = items
+      .map((it, i) => ({ it, text: texts[i]! }))
+      .filter((x) => {
+        if (existing.has(x.text)) return false;
+        existing.add(x.text);
+        return true;
+      });
+    const vecs = await embedder.embed(fresh.map((f) => f.text));
+    await archive.remember(
+      fresh.map((f, i) => ({ text: f.text, title: f.it.title, runId: args.label ?? "recorded", embedder: embedder.id, vector: vecs[i]! })),
+    );
+    return { namespace: args.namespace, recorded: fresh.length, skippedDuplicates: items.length - fresh.length, archiveSize: archive.sparks.length };
+  }
+
+  /**
    * Push an existing idea or plan: attack it, then return a mutation that keeps its
    * strange core and moves further from the consensus. Three calls.
    */
-  async challenge(args: { problem: string; idea: string | IdeaDraft; context?: string; target?: Target }) {
+  async challenge(args: { problem: string; idea: string | IdeaDraft; context?: string; target?: Target; namespace?: string }) {
     const llm = new MeteredProvider(this.deps.provider, 3);
     const embedder = this.deps.embedder;
     const consensus = await this.probe(llm, args.problem, args.context);
@@ -418,7 +452,10 @@ export class DivergentEngine {
     const wells = await embedder.embed(consensus.obvious);
     const cal = calibrate(wells, "balanced");
     const [vOrig, vMut, vCounter] = await embedder.embed([ideaText(idea), ideaText(mut.idea), ideaText(attack.counterIdea)]);
-    const measure = (v: number[]) => gate({ vector: v, text: "", wells, archive: [], peers: [], bannedWords: [], calibration: cal }).metrics;
+    const archive = new Archive(args.namespace ?? "default", this.deps.archiveRoot);
+    await archive.load(embedder);
+    const measure = (v: number[]) =>
+      gate({ vector: v, text: "", wells, archive: archive.vectors(), peers: [], bannedWords: [], calibration: cal }).metrics;
     const original = measure(vOrig!);
     const mutation = measure(vMut!);
     return {

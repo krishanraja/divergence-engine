@@ -103,6 +103,7 @@ server.registerTool(
       obvious: z.array(z.string()).optional().describe("Known conventional answers. Omit to have the engine map them (one call)."),
       namespace: z.string().optional(),
       judge: z.boolean().optional().describe("Also run the blind originality judge (one more call)."),
+      bannedWords: z.array(z.string()).optional().describe("A kill list. Ideas containing these get status rejected_anchor_word."),
     },
   },
   async (args) => {
@@ -119,11 +120,28 @@ server.registerTool(
   {
     title: "Challenge an idea",
     description: "Three calls. Finds the conventional twin of an existing idea or plan, its fatal flaw, a rival counter-idea, and a mutation that keeps its strange core while moving further from the consensus.",
-    inputSchema: { problem: z.string(), idea: z.string(), context: z.string().optional(), target: z.enum(targets).optional() },
+    inputSchema: { problem: z.string(), idea: z.string(), context: z.string().optional(), target: z.enum(targets).optional(), namespace: z.string().optional() },
   },
   async (args) => {
     try {
       return json(await (await engine()).challenge(args));
+    } catch (err) {
+      return fail(err);
+    }
+  },
+);
+
+server.registerTool(
+  "record_outputs",
+  {
+    title: "Record shipped outputs",
+    description:
+      "Zero model calls. Add what a consuming engine actually shipped (posts, hooks, plays) to its namespace memory, so later runs and scores treat them as already used. Send de-identified text only.",
+    inputSchema: { namespace: z.string(), items: z.array(z.string()), label: z.string().optional() },
+  },
+  async (args) => {
+    try {
+      return json(await (await engine()).record(args));
     } catch (err) {
       return fail(err);
     }
