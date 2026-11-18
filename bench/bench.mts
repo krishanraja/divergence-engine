@@ -21,6 +21,8 @@
  */
 import { parseArgs } from "node:util";
 import { writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { z } from "zod";
 import { DivergentEngine } from "../src/engine.js";
 import { AnthropicProvider } from "../src/llm/anthropic.js";
@@ -49,7 +51,7 @@ const { values } = parseArgs({
 const n = Number(values.count);
 const provider = new AnthropicProvider();
 const embedder = await createEmbedder(undefined, (m) => console.error(`warning: ${m}`));
-const engine = new DivergentEngine({ provider, embedder, archiveRoot: `.divergent-bench-${Date.now()}` });
+const engine = new DivergentEngine({ provider, embedder, archiveRoot: path.join(tmpdir(), `divergent-bench-${Date.now()}`) });
 
 // The engine's judge also scores here, so the judge cannot favour its own pipeline's
 // phrasing: every arm is stripped to title + mechanism before scoring.

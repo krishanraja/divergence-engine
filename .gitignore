@@ -3,3 +3,5 @@ dist/
 .divergent/
 *.log
 .env
+.divergent-bench-*/
+bench-result.json
