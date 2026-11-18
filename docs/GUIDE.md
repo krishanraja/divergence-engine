@@ -155,9 +155,19 @@ const engine = await createEngine();
 const { sparks } = await engine.provoke({ problem, namespace: "content-engine-ideas", target: "writing" });
 ```
 
-### Through Control Center (planned)
+### Through Control Center (built, live when control-center#963 merges)
 
-Growth runners hold no model keys, by design. The planned route is `POST /api/growth/engines/<slug>/divergent`, built the same way as the humour route: Control Center's key, your engine's own bearer, a daily cap, every call metered. Until it ships, use the session or local routes above. See [integration-plan.md](integration-plan.md).
+Growth runners hold no model keys, by design, so the fleet reaches the engine through Control Center, built the same way as the humour route: Control Center's key, your own bearer, daily caps, every call metered as `divergent-<caller>`.
+
+| Door | Who |
+|---|---|
+| `POST /api/growth/engines/<slug>/divergent` with `{ op, ... }` | a growth engine, on its own bearer. Check `features.divergent` in capabilities first |
+| `POST /api/divergent/<caller>` | a repository that is no growth engine (content-engine, on its operator key) |
+| `divergent_score`, `divergent_record`, `divergent_run` | Krish's own sessions, on the Control Center connector |
+
+Caps per caller per day: one `diverge`, twenty `provoke`, `challenge` or `map`, $5. `score` and `record` are free. Your namespace is your slug or `<slug>:<lane>`. Full contract: Control Center's `docs/app/everywhere/divergent.md`.
+
+**Label what you propose.** A proposal built from a spark carries one `evidence` item, `{ "label": "divergent-thinker spark <id>, run <run>", "url": null }`. That label is how Control Center counts the ideas Krish approves, which is this engine's North Star.
 
 ---
 

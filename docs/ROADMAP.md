@@ -22,14 +22,14 @@ As of 2026-11-18. Phase 0 is complete: the engine works live, beat a prompt-matc
 | 1.4 | An OpenAI embedder, gate factors per embedder, and the calibration set shipped in the package so it can run where the key lives | none |
 | 1.5 | Installable from GitHub at a pinned commit (`prepare` builds it) | none |
 
-## Phase 2: hosted in Control Center (control-center)
+## Phase 2: hosted in Control Center (control-center) 🟡 built, draft [control-center#963](https://github.com/krishanraja/control-center/pull/963), waits on the migration and your ready
 
 | Step | What | Gate |
 |---|---|---|
 | 2.1 | `api/_divergent.ts`: the engine on Control Center's model and meter (`divergent-<caller>`), its embeddings, a Supabase store, a daily call cap and dollar ceiling per caller | none to build |
-| 2.2 | Protocol 1.45.0: the `divergent` op on the engine route, `features.divergent`, the bundle regenerated | none to build |
+| 2.2 | The `divergent` op on the engine route behind `features.divergent`, no version bump (as `humour` shipped), the bundle regenerated | none to build |
 | 2.3 | `DIVERGENT_CALLERS` for repositories that are no growth engine (content-engine on its operator key, as humour) | none to build |
-| 2.4 | Gateway operations for cloud sessions: `divergent.score` free, the generating ones approved per call | none to build |
+| 2.4 | Connector tools for his sessions: `divergent_score`, `divergent_record`, `divergent_run` (the gateway runs one request per operation, so a 25-call run belongs on the connector) | none to build |
 | 2.5 | Migration: `divergent_memory`, `divergent_lens_stats` | **Krish: apply the migration** |
 | 2.6 | A calibration op that runs the shipped calibration set on Control Center's embedder; generation stays off until it passes | runs after deploy |
 | 2.7 | Tool catalog entry (`TOOL_VALUE_CATALOG`, `TOOL_PLACEMENTS`), tests, `docs/app/growth/divergent.md` | none |
@@ -49,17 +49,17 @@ Each merges itself on green. Each consumer checks every spark against its own wa
 
 **Cut:** AEO-Engine and hunter (weak fits; their generation is anchored to evidence on purpose), higgsfield-generator (a vendor copy with no venture of its own), content-watcher and krish-clone (no creative step).
 
-## Phase 4: the skill layer (ai-harness)
+## Phase 4: the skill layer (ai-harness) 🟡 proposed, draft [ai-harness#284](https://github.com/krishanraja/ai-harness/pull/284), waits on your admission
 
 | Step | What | Gate |
 |---|---|---|
 | 4.1 | A proposal with one-line hooks: strategy-brief step 6, krish-principles 5.4, build-apps-with-krish's reset trace, krish-design (one arm only); tool-router's description gains the capability | **Krish: admission ruling** |
 
-## Phase 5: measured automatically (the finish line)
+## Phase 5: measured automatically (the finish line) 🟡 the reader is built in control-center#963; live when it merges
 
 | Step | What |
 |---|---|
-| 5.1 | Every engine-sourced proposal carries `source: divergent-thinker` and its spark id (part of protocol 1.45.0) |
+| 5.1 | Every engine-sourced proposal carries one `evidence` item labelled `divergent-thinker spark <id>, run <run>` (no protocol change: the schema already allows it) |
 | 5.2 | A `READERS` entry in Control Center's North Star refresh counts Krish's approvals of them per week and commits this repository's state line |
 | 5.3 | `docs/approvals.md` becomes history; the guide and the integration plan say what is live |
 
