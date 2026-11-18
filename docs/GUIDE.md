@@ -172,6 +172,7 @@ Growth runners hold no model keys, by design. The planned route is `POST /api/gr
 
 ## What to do with what comes back
 
+- **Check every spark against your walls before Krish sees it.** The engine reads your constraints but its judge scores originality and usefulness, not policy. On its first live runs (18 November, `docs/runs/`) it proposed one play that used strangers' photos without consent and one that would have sold AI-made work into communities that ban it. Both read well. Your engine's own rules, not the engine's score, decide what goes forward.
 - **Reduce to one.** The engine returns a portfolio. Your step returns a recommendation. Pick the spark, say why, and keep the others in the trace.
 - **Keep the label.** An idea the engine proposed is engine-sourced. It goes through your normal proposal and approval flow, never presented as anyone's own.
 - **Read the conventional twin.** Every spark that went through the adversary names the obvious thing it beats. That line is your guardrail when you execute: if the build starts drifting toward it, you are rebuilding the default.
