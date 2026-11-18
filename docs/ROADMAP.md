@@ -35,7 +35,7 @@ As of 2026-11-18. Phase 0 is complete: the engine works live, beat a prompt-matc
 | 2.7 | Tool catalog entry (`TOOL_VALUE_CATALOG`, `TOOL_PLACEMENTS`), tests, `docs/app/growth/divergent.md` | none |
 | 2.8 | Merge, which deploys | **Krish: model, caps, then merge** |
 
-## Phase 3: consumers wired (one pull request per repository)
+## Phase 3: consumers wired (one pull request per repository) 🟡 built, four drafts, each dormant until Control Center serves `features.divergent`
 
 | Step | Repository | What |
 |---|---|---|
@@ -43,7 +43,16 @@ As of 2026-11-18. Phase 0 is complete: the engine works live, beat a prompt-matc
 | 3.2 | growth-mindmake | Rule 5; `map_consensus` on the weekly experiment |
 | 3.3 | growth-makeyourmindup | Rule 5; the hook score guard before the mix plan |
 | 3.4 | content-engine | The daily wildcard through `provoke`; the score guard beside `repeat_review`; record what published |
-| 3.5 | growth-legibility, growth-fulltime | Wired and dormant while held: no call while the engine is held |
+| 3.5 | growth-legibility, growth-fulltime | Deferred: both are held, so they propose nothing. Wire them on release, copying growth-heartside's `engine/divergent.py` pattern |
+
+| Repository | Draft | Checks run locally |
+|---|---|---|
+| growth-heartside | [#128](https://github.com/krishanraja/growth-heartside/pull/128) | self-test 343, unit 500 OK |
+| growth-mindmake | [#146](https://github.com/krishanraja/growth-mindmake/pull/146) | contracts, check, conveyor, 860 tests, mutate 135 of 135 |
+| growth-makeyourmindup | [#132](https://github.com/krishanraja/growth-makeyourmindup/pull/132) | self-test 1436 OK |
+| content-engine | [#849](https://github.com/krishanraja/content-engine/pull/849) | verify:quick, 11 new tests; adds a `divergent` chain-cap family |
+
+Two fixes made after review: growth-mindmake was sending words that keep internal data out of email openings ("Krish", "research", "new") as gate words, which would have rejected almost every idea; growth-makeyourmindup sent his name. Both now send only puffery words. Lesson for every consumer: `bannedWords` is a kill list for ideas, never a list of words a different check guards.
 
 Each merges itself on green. Each consumer checks every spark against its own walls before it reaches Krish (the lesson of 18 November).
 

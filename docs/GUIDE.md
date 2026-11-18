@@ -175,7 +175,7 @@ Caps per caller per day: one `diverge`, twenty `provoke`, `challenge` or `map`, 
 
 **One namespace per consumer, sub-namespaces per lane.** Use your engine id (`growth-heartside`), and a suffix for a lane with its own history (`growth-heartside:jokes`, `content-engine-ideas`). Memory and lens learning are per namespace, so a shared namespace means you are avoiding someone else's history.
 
-**Bring your kill list.** Every repo in the fleet already keeps one: `SLOP`, `BANNED`, `kill-list.v1.json`, the floor of rejected lines. Pass it as `bannedWords`. Pass your already-tried plays as `cliches`, so the engine has to go past them instead of rediscovering them.
+**Bring your kill list, and only that.** Pass puffery and banned-voice words as `bannedWords` (`SLOP`, the kill list's banned vocabulary). The gate rejects any idea that contains one, so never pass a list another check owns: words that keep internal data out of an email ("research", "record"), file-name words ("new", "final"), or a name. Those would reject almost every idea. Pass your already-tried plays as `cliches`, so the engine has to go past them instead of rediscovering them.
 
 **Pick a target.** `strategy`, `writing`, `video`, `design`, `product`, `research` or `code` shapes the ready-to-run prompt on each spark for whatever step comes next.
 
