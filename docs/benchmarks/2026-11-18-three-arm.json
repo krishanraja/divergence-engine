@@ -1,0 +1,84 @@
+{
+  "verdict": "PASS",
+  "wins": 3,
+  "rows": [
+    {
+      "problem": "How can an independent bakery compete with supermarkets?",
+      "naive": {
+        "meanScore": 0.5252493959996014,
+        "outsideConsensus": 1,
+        "meanRemoteness": 1.1031839771035632,
+        "meanOriginality": 2.8,
+        "meanUsefulness": 3
+      },
+      "strong": {
+        "meanScore": 0.6463660530269731,
+        "outsideConsensus": 1,
+        "meanRemoteness": 1.1161011497575517,
+        "meanOriginality": 3.8,
+        "meanUsefulness": 3.2
+      },
+      "engine": {
+        "meanScore": 0.6924803645280242,
+        "outsideConsensus": 1,
+        "meanRemoteness": 1.2779319869292722,
+        "meanOriginality": 3.8,
+        "meanUsefulness": 3.2
+      },
+      "engineCostUsd": 1.3663,
+      "engineCalls": 29
+    },
+    {
+      "problem": "How should a B2B software company reduce customer churn?",
+      "naive": {
+        "meanScore": 0.5640114502859903,
+        "outsideConsensus": 1,
+        "meanRemoteness": 1.1094736155441054,
+        "meanOriginality": 2.6,
+        "meanUsefulness": 3.8
+      },
+      "strong": {
+        "meanScore": 0.6735927154640065,
+        "outsideConsensus": 1,
+        "meanRemoteness": 1.1826535405482406,
+        "meanOriginality": 4,
+        "meanUsefulness": 3.4
+      },
+      "engine": {
+        "meanScore": 0.7201557572237622,
+        "outsideConsensus": 1,
+        "meanRemoteness": 1.3247396717587006,
+        "meanOriginality": 3.8,
+        "meanUsefulness": 3.6
+      },
+      "engineCostUsd": 0.9508,
+      "engineCalls": 23
+    },
+    {
+      "problem": "Hooks for a short video about AI anxiety among senior leaders",
+      "naive": {
+        "meanScore": 0.6245731335330531,
+        "outsideConsensus": 1,
+        "meanRemoteness": 1.0369353596195436,
+        "meanOriginality": 3,
+        "meanUsefulness": 4
+      },
+      "strong": {
+        "meanScore": 0.6854141673689955,
+        "outsideConsensus": 1,
+        "meanRemoteness": 1.2169451186418119,
+        "meanOriginality": 3.6,
+        "meanUsefulness": 3.6
+      },
+      "engine": {
+        "meanScore": 0.7945296890034358,
+        "outsideConsensus": 1,
+        "meanRemoteness": 1.3466480055086145,
+        "meanOriginality": 4.4,
+        "meanUsefulness": 3.8
+      },
+      "engineCostUsd": 0.9142,
+      "engineCalls": 23
+    }
+  ]
+}

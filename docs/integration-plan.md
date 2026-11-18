@@ -35,7 +35,7 @@ The same route shape solves all four problems a direct integration would hit:
 
 ## Cost ladder
 
-Default to the cheapest rung that answers the question. Measured where marked; the rest are estimates until the benchmark reports.
+Default to the cheapest rung that answers the question. Measured where marked; the rest are estimates.
 
 | Rung | Tool | Model calls | Cost | Use as |
 |---|---|---|---|---|
@@ -43,7 +43,7 @@ Default to the cheapest rung that answers the question. Measured where marked; t
 | 1 | `map_consensus` | 1 | cents (est.) | See the default before choosing |
 | 2 | `provoke` | 2 | **$0.15, 85 s (measured, 18 Nov)** | Routine fresh options |
 | 3 | `challenge` | 3 | cents (est.) | Attack and push one existing idea |
-| 4 | `diverge` | 25 to 40 | see benchmark section | Weekly, behind a U4/U5 trigger and your approval |
+| 4 | `diverge` | 23 to 29 (measured) | **$0.91 to $1.37, about 10 minutes (measured)** | Weekly, behind a U4/U5 trigger and your approval |
 
 Existing specialist calls in the fleet cost $0.0015 to $0.005 each. `diverge` is two to three orders of magnitude above that, so it never runs on a schedule without a cap.
 
@@ -119,7 +119,7 @@ Do not create a new skill yet. It would struggle with the harness's own missing-
 
 | Phase | What | Gate to start | Your decision needed |
 |---|---|---|---|
-| 0 (this week) | MCP server in Claude Code on your machine. Run Heartside and Mindmake U5 plays by hand. Seed both namespaces with `record_outputs`. | Benchmark verdict | None beyond running it |
+| 0 (this week) | MCP server in Claude Code on your machine. Run Heartside and Mindmake U5 plays by hand. Seed both namespaces with `record_outputs`. | Met: benchmark passed | None beyond running it |
 | 1 | Control Center route `POST /api/growth/engines/<slug>/divergent`, a copy of the humour route: Control Center's key, per-engine bearer, daily cap, metered under `divergent-<slug>`. Archive in Supabase. Synchronous `provoke`, `score`, `record`, `challenge`, `map`; `diverge` as an async job, since a full run can exceed a serverless time limit. | You approved at least one engine-made play in Phase 0 | Deploy, daily caps, the dollar ceiling per engine |
 | 2 | Wire the growth engines' rule 5 to the route; content-engine wildcard and score guard; catalog entry. | Phase 1 live | Whether content-engine's paid calls count against the $15 chain |
 | 3 | Skill hooks in ai-harness, higgsfield wrapper skill, the rest. | Phase 2 shows the tool is used | Harness admission rulings |
@@ -134,7 +134,7 @@ Send de-identified text only, keep the archive out of every repository, and reco
 
 ## Next 24 to 72 hours
 
-1. Read the benchmark verdict (below). If it fails, apply the README's fallbacks before anything else.
+1. The benchmark passed (below), so no fallback is needed.
 2. Register the MCP server on your machine: `claude mcp add divergent -- node /path/to/divergent-thinker/dist/mcp.js`, with your key in the environment.
 3. Run `diverge` for Heartside's U5 plays with the order-loop plays as `cliches`, and for Mindmake's routes to meetings. Put the top play from each in front of you through the engines' normal proposal flow.
 4. Count how many you approve. That number, not the benchmark, decides Phase 1.
@@ -142,8 +142,34 @@ Send de-identified text only, keep the archive out of every repository, and reco
 ## Counterpoints
 
 - **This could be more building while the numbers sit at U5.** All five growth engines are stalled or unmeasured. The engine earns a place only if a play it produces gets approved and moves a number. Phase 0 is deliberately manual to test exactly that before any infrastructure.
-- **dialectica's evidence says a well-written single call often matches multi-call pipelines.** If the benchmark agrees, the right integration is `provoke` plus the zero-cost scorer everywhere, and `diverge` nowhere.
+- **The benchmark win is narrow.** The engine beat a well-written single call on distance from the consensus every time, but blind originality was a clear win on only one problem in three, and the sample is small. If Phase 0 approvals come mostly from `provoke`-grade ideas, keep `diverge` for rare occasions and lean on `provoke` and the zero-cost scorer.
 
 ## Benchmark result
 
-Pending: the live run started 2026-11-18 and this section is filled in when it reports.
+**PASS, 3 of 3 problems, against the prompt-matched single call.** Live run, 18 November 2026, Opus 5.5. Raw results: [benchmarks/2026-11-18-three-arm.json](benchmarks/2026-11-18-three-arm.json).
+
+Three arms per problem, five ideas each, pooled and scored by one blind judge against the same consensus map. The strong arm is one call given the same consensus as forbidden territory and all twelve lenses.
+
+| Problem | Divergence score (engine / strong / naive) | Distance from consensus | Blind originality | Usefulness | Engine cost |
+|---|---|---|---|---|---|
+| Independent bakery vs supermarkets | **0.69** / 0.65 / 0.53 | **1.28** / 1.12 / 1.10 | 3.8 / 3.8 / 2.8 | 3.2 / 3.2 / 3.0 | $1.37, 29 calls |
+| B2B churn | **0.72** / 0.67 / 0.56 | **1.32** / 1.18 / 1.11 | 3.8 / **4.0** / 2.6 | **3.6** / 3.4 / 3.8 | $0.95, 23 calls |
+| Hooks on AI anxiety among senior leaders | **0.79** / 0.69 / 0.62 | **1.35** / 1.22 / 1.04 | **4.4** / 3.6 / 3.0 | 3.8 / 3.6 / 4.0 | $0.91, 23 calls |
+
+**What it shows:**
+
+- The engine's consistent advantage is distance from the consensus, on every problem, while judged usefulness held or rose against the strong arm.
+- On blind-judged originality it is mixed against the strong arm: one tie, one small loss, one clear win (the video hooks, 4.4 against 3.6).
+- A well-written single call already captures most of the gain over a naive prompt (originality 3.6 to 4.0 against 2.6 to 3.0). That is why `provoke`, which is essentially that call plus the gate and portfolio, is the default rung, and `diverge` is reserved for when it counts.
+- A full `diverge` costs **$0.91 to $1.37 and 23 to 29 calls**, measured. That is roughly 7 to 9 times a `provoke`.
+
+**Limits.**
+
+- Three problems and five ideas each is a small sample.
+- The judge made one pass, and it is the same model family as the generators.
+- The "share outside the consensus" criterion did not discriminate: every arm scored 100%, so it passed as a tie.
+- The divergence score includes distance, which the engine selects for directly, so it is not fully independent evidence. Blind originality is the independent axis.
+
+**What it changes in this plan:** nothing in the ordering. It confirms the cost ladder. The real test is still Phase 0: whether you approve plays the engine produces.
+
+**To strengthen it:** rerun on all five problems with two judge passes and a different-family judge (`DIVERGENT_MODEL_JUDGE`), and replace the binary outside-consensus criterion with mean distance.

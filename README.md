@@ -91,7 +91,7 @@ claude mcp add divergent -e ANTHROPIC_API_KEY=... -- node /absolute/path/to/dive
 
 | Tool | Calls | Use |
 |---|---|---|
-| `diverge` | about 25 to 40 | Full run. Before committing to an approach. |
+| `diverge` | 23 to 29 (measured, about $1) | Full run. Before committing to an approach. |
 | `provoke` | 2 | Cheap, frequent inspiration. About $0.15 a run, measured. |
 | `map_consensus` | 1 | See the default before deciding whether to diverge. |
 | `score_divergence` | 0 to 2 | Measure any engine's outputs. Zero calls when you pass `obvious`. |
@@ -140,7 +140,7 @@ const report = await engine.run({ problem, namespace: "content-engine", target: 
 
 Run options (MCP, HTTP, library): `count`, `temperament` (`grounded` / `balanced` / `wild`), `target` (`generic`, `code`, `writing`, `research`, `strategy`, `design`, `video`, `product`), `cliches`, `bannedWords`, `lenses`, `namespace`, `maxCalls` (hard ceiling, default 40), `seed`, `dialecticRounds`, `judgePasses`, `crossPollinate`, `remember`.
 
-**Cost.** `provoke` measured at about $0.15 and 85 seconds on Opus 5.5 (18 November 2026). A default `diverge` is roughly 30 to 40 calls; see the benchmark section of the integration plan for measured cost. The call ceiling is enforced before every call, and every report includes `usage` with token counts and estimated cost. A cheaper judge is one variable away: `DIVERGENT_MODEL_JUDGE=claude-sonnet-5-5`.
+**Cost.** `provoke` measured at about $0.15 and 85 seconds on Opus 5.5 (18 November 2026). A default `diverge` measured at 23 to 29 calls, $0.91 to $1.37 and about 10 minutes. The call ceiling is enforced before every call, and every report includes `usage` with token counts and estimated cost. A cheaper judge is one variable away: `DIVERGENT_MODEL_JUDGE=claude-sonnet-5-5`.
 
 ## Verification status
 
@@ -154,9 +154,9 @@ Run options (MCP, HTTP, library): `count`, `temperament` (`grounded` / `balanced
 | HTTP server: health, auth, validation, zero-call scoring | Pass |
 | Anthropic request shape (model, effort, structured output schema, refusal fallbacks, prompt caching, no sampling params), checked against a captured request | Pass |
 | Model roster rotation, checked on the wire | Pass |
-| **Live benchmark against a prompt-matched single call** (`npm run bench`) | **Not run.** No API key in the build environment. Three arms (naive prompt, prompt-matched strong single call, engine), scored on one yardstick with pooled blind judging. Pass signal is set in advance in `bench/bench.mts`: the engine must beat the **strong** arm on mean divergence score and share outside the consensus on most problems, without losing more than 0.5 judged usefulness. |
+| **Live benchmark against a prompt-matched single call** (`npm run bench`, 18 November 2026) | **PASS, 3 of 3 problems.** The engine scored higher on divergence and distance from the consensus on every problem, with judged usefulness held or higher. Blind originality was mixed against the strong arm (one tie, one small loss, one clear win). Full table and limits in [docs/integration-plan.md](docs/integration-plan.md#benchmark-result). |
 
-Until the benchmark runs, the claim that the engine beats a single call is a hypothesis with a defined test, not a result. dialectica's evidence makes a loss to the strong arm a real possibility. If that happens, the ranked fallbacks are: switch the generator to a heterogeneous roster, then cut the dialectic stage, then keep only `provoke` and `score_divergence`.
+The pass signal was set before the run: beat the strong arm on mean divergence score and share outside the consensus on most problems, without losing more than 0.5 judged usefulness. The honest reading is narrower than the headline. The engine reliably goes further from the consensus than a well-written single call at no cost to usefulness. Whether that is more original to a human reader is supported on one problem in three and needs a larger run.
 
 ## Development
 

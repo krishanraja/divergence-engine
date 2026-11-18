@@ -44,7 +44,7 @@ Think of these as a ladder. Start at the bottom. Climb only when the rung below 
 | `map_consensus` | 1 | cents | You want to see the default before deciding whether to leave it. |
 | `provoke` | 2 | about $0.15 (measured) | You need a few genuinely fresh options, often and cheaply. |
 | `challenge` | 3 | cents | You have one idea or plan and want it attacked and pushed further out. |
-| `diverge` | 25 to 40 | dollars | A number is stalled and the obvious plays are spent. |
+| `diverge` | about 25 | about $1 (measured: $0.91 to $1.37) | A number is stalled and the obvious plays are spent. |
 
 ### `record_outputs`: the engine's memory of you
 
@@ -195,7 +195,7 @@ Growth runners hold no model keys, by design. The planned route is `POST /api/gr
 - **A dialectical synthesis that slides back toward the middle is thrown away,** and the original kept. Debate tends to split the difference; this one is not allowed to.
 - **The judge is blind and calibrated against the consensus answers,** which score 1. Two shuffled passes are averaged. Strange but useless scores low on purpose.
 - **Every run has a hard call ceiling,** and every report says what it cost.
-- **The engine is measured against a single well-written prompt, not a lazy one.** If it cannot beat that, it says so. See the benchmark section of [integration-plan.md](integration-plan.md).
+- **The engine is measured against a single well-written prompt, not a lazy one.** On 18 November it beat that prompt on 3 of 3 problems: further from the consensus every time, with judged usefulness held or higher. Blind-judged originality was mixed against the strong prompt, a clear win on one problem in three. The full table and its limits are in [integration-plan.md](integration-plan.md#benchmark-result).
 
 ---
 

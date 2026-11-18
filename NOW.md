@@ -6,7 +6,7 @@ as_of: 2026-11-18
 
 **What it is.** The fleet's divergent thinking engine. Other engines consult it when the default answer is not good enough: it maps the consensus, generates away from it, attacks the survivors, judges blind, and returns a few scored ideas that are far from the middle and from each other. It also scores any engine's outputs for how close they sit to the consensus or to what that engine already shipped.
 
-**Where it is right now.** v0.1 on `main`. MCP server, HTTP API, CLI and library. 22 tests pass. The novelty gate is calibrated on real embeddings. A live run against the Claude API works end to end (`provoke`, about $0.15). The prompt-matched benchmark result is in [docs/integration-plan.md](docs/integration-plan.md).
+**Where it is right now.** v0.1 on `main`. MCP server, HTTP API, CLI and library. 22 tests pass. The novelty gate is calibrated on real embeddings. A live run against the Claude API works end to end (`provoke`, about $0.15). The live benchmark passed 3 of 3 against a prompt-matched single call (18 November): further from the consensus every time, usefulness held, originality mixed. A full `diverge` costs about $1. Details in [docs/integration-plan.md](docs/integration-plan.md#benchmark-result).
 
 **North Star (proposed, not set: Krish sets it).** Engine-made ideas Krish approves per week across the fleet. The engine earns its place only when its ideas get approved and move a venture's number.
 
