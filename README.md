@@ -12,7 +12,8 @@ Every model starts from the middle. This one finds the middle on purpose, writes
 It also works as a mirror: send it any engine's output and it tells you whether that output is the consensus in disguise, or something you have already said.
 
 **Start here:**
-- [docs/GUIDE.md](docs/GUIDE.md): the consulting guide. The six moves, the twelve lenses, how to connect your repo, and a block to paste into your AGENTS.md.
+- [docs/WHEN-TO-USE.md](docs/WHEN-TO-USE.md): for any session in any repository. The five signals to reach for it, the five stops, which move, how to call it from where you are, and the fleet repository by repository.
+- [docs/GUIDE.md](docs/GUIDE.md): the consulting guide. The six moves in depth, the twelve lenses, conventions, and a block to paste into your AGENTS.md.
 - [docs/integration-plan.md](docs/integration-plan.md): which repos in the fleet consult it, where, in what order, and the benchmark verdict.
 - The rest of this page: how it works and how it was verified.
 

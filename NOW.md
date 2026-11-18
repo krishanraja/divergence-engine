@@ -12,6 +12,8 @@ as_of: 2026-11-18
 
 v0.1 on `main`. MCP server, HTTP API, CLI and library. 22 tests pass. The novelty gate is calibrated on real embeddings. A live run against the Claude API works end to end (`provoke`, about $0.15). The live benchmark passed 3 of 3 against a prompt-matched single call (18 November): further from the consensus every time, usefulness held, originality mixed. A full `diverge` costs about $1. Details in [docs/integration-plan.md](docs/integration-plan.md#benchmark-result).
 
+**Docs.** [docs/WHEN-TO-USE.md](docs/WHEN-TO-USE.md) tells any session in any repository when and how to consult it; [docs/GUIDE.md](docs/GUIDE.md) goes deeper; [docs/ROADMAP.md](docs/ROADMAP.md) is the path to done.
+
 **North Star (Ruling, Krish, 2026-11-18).** Engine-made ideas Krish approves per week across the fleet ([docs/NORTH_STAR.md](docs/NORTH_STAR.md)). Counted in [docs/approvals.md](docs/approvals.md).
 
 **Next.** Krish gives each approved play to its engine as his instruction in Control Center (the texts are in `now-notes/2026-11-18-phase0.md`). Then measure whether either play produces an order or a good meeting. Two approvals in week one meets the bar to start Phase 1, the Control Center route.

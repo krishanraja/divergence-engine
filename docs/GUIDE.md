@@ -216,18 +216,24 @@ Caps per caller per day: one `diverge`, twenty `provoke`, `challenge` or `map`, 
 ## A block to paste into your AGENTS.md
 
 ```markdown
-## Consulting divergent-thinker
+## Consult divergent-thinker
 
 When the obvious answer is not good enough, consult divergent-thinker
-(krishanraja/divergent-thinker, docs/GUIDE.md). Namespace: <your-engine-id>.
+(krishanraja/divergent-thinker; when to use it: docs/WHEN-TO-USE.md).
+Namespace: <your-engine-id> (or <your-engine-id>:<lane>).
 
-- Before a gate: `score_divergence` against recent outputs and our kill list. Zero cost.
-- After shipping: `record_outputs` with what went live. Zero cost.
-- For a wildcard or a stale brief: `provoke`.
-- At U4 or U5 with nothing proposed: `diverge`, target `strategy`, with our spent plays as `cliches`, then `challenge` on the top play.
+- A number at U4 or U5 with nothing proposed: `diverge`, target `strategy`,
+  our spent plays as `cliches`, then check every spark against our walls.
+- About to commit to an angle or plan: `challenge` it.
+- A draft that feels familiar: `score` it against recent outputs. Free.
+- Something shipped: `record` it. Free.
+- From a session: <our command> divergent <op> --problem "..." (exit 2 means
+  not served or capped: never a pass). Krish's own sessions can also use the
+  Control Center connector tools divergent_score, divergent_record, divergent_run.
 
-Its sparks are proposals. Reduce them to one recommendation, keep them labelled
-as engine-sourced, and send them through the normal approval flow.
+Its sparks are proposals. Reduce them to one, label the evidence
+"divergent-thinker spark <id>, run <run>", and send it through the normal
+approval flow. Pass only puffery as bannedWords.
 ```
 
 ---
