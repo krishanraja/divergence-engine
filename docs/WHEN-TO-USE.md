@@ -73,7 +73,7 @@ Shipped something? -> record it (free).
 | A machine with the repo checked out and an Anthropic key | the local MCP server (`claude mcp add divergent -- node dist/mcp.js`) or the CLI | memory stays on that machine |
 | Any other repository that is no growth engine | `POST /api/divergent/<caller>` once Control Center lists it in `DIVERGENT_CALLERS` | ask Krish; a new caller is one line and a bearer |
 
-**The same flags in every repository's command:** `--problem`, `--context`, `--idea` (challenge), `--ideas-file` and `--obvious-file` (score), `--items-file` (record), `--cliche` (repeatable), `--count`, `--target`, `--temperament`, `--lane`, `--judge`. Exit 0 is done, 1 is flagged, 2 is not served, capped, uncalibrated or held: never treat 2 as a pass.
+**The same flags in every repository's command:** `--problem`, `--context`, `--idea` (challenge), `--ideas-file` and `--obvious-file` (score), `--items-file` and `--label` (record), `--cliche` (repeatable), `--count`, `--target`, `--temperament`, `--lane` (lowercase letters, digits and hyphens only, as Control Center's namespace rule requires), `--judge`. Exit 0 is done, 1 is flagged, 2 is not served, capped, uncalibrated or held: never treat 2 as a pass.
 
 ---
 
