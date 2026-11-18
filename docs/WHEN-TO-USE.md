@@ -81,12 +81,12 @@ Shipped something? -> record it (free).
 
 | Repository | Use it for | Moves | Namespace | Status |
 |---|---|---|---|---|
-| growth-heartside | U4 and U5 recovery plays; the joke lab's retread screen; recording what went live | `diverge`, `score`, `record`, plus anything at will | `growth-heartside`, `growth-heartside:jokes` | wired, draft #128 |
-| growth-mindmake | U4 and U5 routes to good meetings; the weekly experiment against the default; generic pitch openers (shadow) | `diverge`, `map`, `score`, `challenge` | `growth-mindmake`, `growth-mindmake:pitches` | wired, draft #146 |
-| growth-makeyourmindup | U4 and U5 borrowed-audience plays; the hook guard before the mix plan; recording live posts | `diverge`, `score`, `record` | `growth-makeyourmindup`, `growth-makeyourmindup:hooks` | wired, draft #132 |
-| content-engine | the daily wildcard; the repeat guard beside `repeat_review`; a piece's angle before the lock; directed shoots | `provoke`, `score`, `record`, `map`, `challenge` | `content-engine:ideas` and lanes | wired, draft #849 |
+| growth-heartside | U4 and U5 recovery plays; the joke lab's retread screen; recording what went live | `diverge`, `score`, `record`, plus anything at will | `growth-heartside`, `growth-heartside:jokes` | live, #128 |
+| growth-mindmake | U4 and U5 routes to good meetings; the weekly experiment against the default; generic pitch openers (shadow) | `diverge`, `map`, `score`, `challenge` | `growth-mindmake`, `growth-mindmake:pitches` | live, #146 |
+| growth-makeyourmindup | U4 and U5 borrowed-audience plays; the hook guard before the mix plan; recording live posts | `diverge`, `score`, `record` | `growth-makeyourmindup`, `growth-makeyourmindup:hooks` | live, #132 |
+| content-engine | the daily wildcard; the repeat guard beside `repeat_review`; a piece's angle before the lock; directed shoots | `provoke`, `score`, `record`, `map`, `challenge` | `content-engine:ideas` and lanes | live, #849 |
 | growth-legibility, growth-fulltime | the same as the other growth engines | as above | their slugs | held: wire on release, copying growth-heartside |
-| Krish's own sessions | strategy-brief alternatives, the sharper alternative to a call, design's divergence arm, a reset after rejected mocks | `map`, `challenge`, `score`, one `diverge` arm | the venture's slug | connector tools, live with control-center#963 |
+| Krish's own sessions | strategy-brief alternatives, the sharper alternative to a call, design's divergence arm, a reset after rejected mocks | `map`, `challenge`, `score`, one `diverge` arm | the venture's slug | connector tools, live |
 | AEO-Engine | flag recommendation angles that only repeat the first-cited pages, as a flag, never a filter | `score` | `aeo-engine` | optional; never on the questions it measures |
 | hunter | catch boilerplate cover-letter hooks | `score` | `hunter` | optional; its generation is anchored to evidence on purpose |
 | higgsfield work | concept stage of a thumbnail or faceless video, before any generation spend | `provoke` with `target: design` or `video` | the venture's slug | from a session, through the connector |

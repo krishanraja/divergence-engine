@@ -1,6 +1,6 @@
 # North Star
 
-Status: Set (Ruling, Krish, 2026-11-18). Target and deadline proposed, awaiting his confirm.
+Status: Set (Ruling, Krish, 2026-11-18). Target and deadline confirmed (Ruling, Krish, 2026-11-18).
 Owner: Krish Raja
 
 The fleet stops settling for the first answer. Every engine that has to find a new route to its number can consult this one, and the ideas it brings back are good enough that Krish says yes to them, week after week, and they move a venture's number.
@@ -13,8 +13,8 @@ The engine earns its place only one way: Krish approves ideas it made. Distance 
 metric: "Engine-made ideas Krish approves per week, across the fleet"
 unit: count
 direction: up
-target: 5            # proposed 2026-11-18, awaiting Krish's confirm
-deadline: 2026-12-28 # proposed, the Monday of the week the growth ladders end
+target: 5            # confirmed by Krish, 2026-11-18
+deadline: 2026-12-28 # confirmed, the Monday of the week the growth ladders end
 ladder_shape: linear
 source: "Krish's approvals of ideas this engine produced (a spark, a mutation or a hybrid), counted in docs/approvals.md until Control Center tags engine-sourced proposals"
 status: active

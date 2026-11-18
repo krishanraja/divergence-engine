@@ -22,7 +22,7 @@ As of 2026-11-18. Phase 0 is complete: the engine works live, beat a prompt-matc
 | 1.4 | An OpenAI embedder, gate factors per embedder, and the calibration set shipped in the package so it can run where the key lives | none |
 | 1.5 | Installable from GitHub at a pinned commit (`prepare` builds it) | none |
 
-## Phase 2: hosted in Control Center (control-center) 🟡 built, draft [control-center#963](https://github.com/krishanraja/control-center/pull/963), waits on the migration and your ready
+## Phase 2: hosted in Control Center (control-center) ✅ merged [control-center#963](https://github.com/krishanraja/control-center/pull/963), migration applied 18 Nov
 
 | Step | What | Gate |
 |---|---|---|
@@ -35,7 +35,7 @@ As of 2026-11-18. Phase 0 is complete: the engine works live, beat a prompt-matc
 | 2.7 | Tool catalog entry (`TOOL_VALUE_CATALOG`, `TOOL_PLACEMENTS`), tests, `docs/app/growth/divergent.md` | none |
 | 2.8 | Merge, which deploys | **Krish: model, caps, then merge** |
 
-## Phase 3: consumers wired (one pull request per repository) 🟡 built, four drafts, each dormant until Control Center serves `features.divergent`
+## Phase 3: consumers wired (one pull request per repository) ✅ merged, all four on main with an at-will command each
 
 | Step | Repository | What |
 |---|---|---|
@@ -45,7 +45,7 @@ As of 2026-11-18. Phase 0 is complete: the engine works live, beat a prompt-matc
 | 3.4 | content-engine | The daily wildcard through `provoke`; the score guard beside `repeat_review`; record what published |
 | 3.5 | growth-legibility, growth-fulltime | Deferred: both are held, so they propose nothing. Wire them on release, copying growth-heartside's `engine/divergent.py` pattern |
 
-| Repository | Draft | Checks run locally |
+| Repository | Pull request (merged) | Checks run locally |
 |---|---|---|
 | growth-heartside | [#128](https://github.com/krishanraja/growth-heartside/pull/128) | self-test 343, unit 500 OK |
 | growth-mindmake | [#146](https://github.com/krishanraja/growth-mindmake/pull/146) | contracts, check, conveyor, 860 tests, mutate 135 of 135 |
@@ -58,13 +58,13 @@ Each merges itself on green. Each consumer checks every spark against its own wa
 
 **Cut:** AEO-Engine and hunter (weak fits; their generation is anchored to evidence on purpose), higgsfield-generator (a vendor copy with no venture of its own), content-watcher and krish-clone (no creative step).
 
-## Phase 4: the skill layer (ai-harness) 🟡 proposed, draft [ai-harness#284](https://github.com/krishanraja/ai-harness/pull/284), waits on your admission
+## Phase 4: the skill layer (ai-harness) ✅ admitted by Krish 18 Nov, [ai-harness#284](https://github.com/krishanraja/ai-harness/pull/284)
 
 | Step | What | Gate |
 |---|---|---|
 | 4.1 | A proposal with one-line hooks: strategy-brief step 6, krish-principles 5.4, build-apps-with-krish's reset trace, krish-design (one arm only); tool-router's description gains the capability | **Krish: admission ruling** |
 
-## Phase 5: measured automatically (the finish line) 🟡 the reader is built in control-center#963; live when it merges
+## Phase 5: measured automatically (the finish line) ✅ the reader is live with control-center#963
 
 | Step | What |
 |---|---|
