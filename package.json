@@ -11,7 +11,7 @@
     "cli": "node dist/cli.js",
     "bench": "node --import tsx bench/bench.mts",
     "calibrate": "node --import tsx bench/calibrate.mts",
-    "prepare": "tsc -p tsconfig.json"
+    "check:dist": "node scripts/check-dist.mjs"
   },
   "repository": {
     "type": "git",

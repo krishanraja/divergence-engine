@@ -19,4 +19,4 @@ Read `NOW.md` first, then `README.md` and `docs/GUIDE.md`. Before a session that
 3. **The engine proposes; it never sends, posts or spends on anyone's behalf.** Its output goes into the consuming engine's own approval flow.
 4. **Model calls have a hard ceiling per run** (`maxCalls`). A change that adds calls says what it costs, measured.
 5. **No em dashes, no hype words** in docs or prompts (the generator's own kill list is in `src/prompts.ts`).
-6. **Checks before pushing:** `npm run typecheck`, `npm test`, and `npm run calibrate` after any change to the gate or the embedder.
+6. **Checks before pushing:** `npm run typecheck`, `npm test`, `npm run build` then `npm run check:dist` (dist/ is committed: Control Center installs a pinned tarball with no build step), and `npm run calibrate` after any change to the gate or the embedder.
