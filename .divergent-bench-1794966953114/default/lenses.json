@@ -1,0 +1,50 @@
+{
+  "inversion": {
+    "alpha": 7,
+    "beta": 3
+  },
+  "far-analogy": {
+    "alpha": 1,
+    "beta": 1
+  },
+  "first-principles": {
+    "alpha": 5,
+    "beta": 1
+  },
+  "constraint-flip": {
+    "alpha": 4,
+    "beta": 2
+  },
+  "extreme-user": {
+    "alpha": 12,
+    "beta": 2
+  },
+  "subtraction": {
+    "alpha": 1,
+    "beta": 1
+  },
+  "scale-shift": {
+    "alpha": 9,
+    "beta": 1
+  },
+  "enemy-as-resource": {
+    "alpha": 3,
+    "beta": 3
+  },
+  "conceptual-blend": {
+    "alpha": 5,
+    "beta": 1
+  },
+  "abductive": {
+    "alpha": 1,
+    "beta": 1
+  },
+  "future-back": {
+    "alpha": 5,
+    "beta": 1
+  },
+  "who-pays": {
+    "alpha": 1,
+    "beta": 1
+  }
+}

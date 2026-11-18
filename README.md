@@ -1,10 +1,20 @@
 # divergent-thinker
 
-A divergent thinking engine your other engines consult when the default answer is not good enough.
+**The engine your other engines consult when the obvious answer is not good enough.**
 
-It maps what everyone else will say, forces generation away from it through cognitive lenses, attacks the survivors adversarially, judges them blind, and returns a small, mutually different portfolio of scored ideas. Each idea comes with its lineage, the conventional idea it beats, and a ready-to-run prompt for the engine that will build it.
+Every model starts from the middle. This one finds the middle on purpose, writes it down, forbids itself from going there, and brings back a few ideas that are measurably outside the consensus, survived an adversary, and still have a first step you could take this week.
 
-It also works the other way round, as a critic: send it any engine's output and it tells you how far that output sits from the consensus, and from what that engine has produced before.
+> *How can an independent bakery compete with supermarkets?*
+> Everyone else says: bake fresher, specialise, know your regulars, post on Instagram, start a loyalty card.
+> The engine said: **bake for dinner, not breakfast**, when supermarket shelves are at their worst and your bakers stop working 3am shifts.
+> Two model calls, about $0.15, 85 seconds. Live run, 18 November 2026.
+
+It also works as a mirror: send it any engine's output and it tells you whether that output is the consensus in disguise, or something you have already said.
+
+**Start here:**
+- [docs/GUIDE.md](docs/GUIDE.md): the consulting guide. The six moves, the twelve lenses, how to connect your repo, and a block to paste into your AGENTS.md.
+- [docs/integration-plan.md](docs/integration-plan.md): which repos in the fleet consult it, where, in what order, and the benchmark verdict.
+- The rest of this page: how it works and how it was verified.
 
 ## Why this exists
 
@@ -82,10 +92,11 @@ claude mcp add divergent -e ANTHROPIC_API_KEY=... -- node /absolute/path/to/dive
 | Tool | Calls | Use |
 |---|---|---|
 | `diverge` | about 25 to 40 | Full run. Before committing to an approach. |
-| `provoke` | 2 | Cheap, frequent inspiration. |
+| `provoke` | 2 | Cheap, frequent inspiration. About $0.15 a run, measured. |
 | `map_consensus` | 1 | See the default before deciding whether to diverge. |
 | `score_divergence` | 0 to 2 | Measure any engine's outputs. Zero calls when you pass `obvious`. |
 | `challenge` | 3 | Attack an existing idea or plan and return a stronger, further-out mutation. |
+| `record_outputs` | 0 | Tell the engine what you shipped, so it never hands it back. |
 | `list_lenses` | 0 | The twelve lenses. |
 
 ### HTTP (n8n, edge functions, scripts)
@@ -96,7 +107,7 @@ curl -H "Authorization: Bearer choose-a-token" -X POST localhost:8787/provoke \
   -d '{"problem":"Hooks for a video about AI anxiety among senior leaders","namespace":"video-engine","target":"video"}'
 ```
 
-Routes: `POST /diverge`, `/provoke`, `/map`, `/score`, `/challenge`, `GET /health`.
+Routes: `POST /diverge`, `/provoke`, `/map`, `/score`, `/challenge`, `/record`, `GET /health`.
 
 ### CLI
 
@@ -129,14 +140,15 @@ const report = await engine.run({ problem, namespace: "content-engine", target: 
 
 Run options (MCP, HTTP, library): `count`, `temperament` (`grounded` / `balanced` / `wild`), `target` (`generic`, `code`, `writing`, `research`, `strategy`, `design`, `video`, `product`), `cliches`, `bannedWords`, `lenses`, `namespace`, `maxCalls` (hard ceiling, default 40), `seed`, `dialecticRounds`, `judgePasses`, `crossPollinate`, `remember`.
 
-**Cost.** Unmeasured until the live benchmark runs. Estimate for a default `diverge` on Opus 5.5: roughly 30 to 40 calls, on the order of $1 to $3. `provoke` is two calls. The call ceiling is enforced before every call, and every report includes `usage` with token counts and estimated cost. A cheaper judge is one variable away: `DIVERGENT_MODEL_JUDGE=claude-sonnet-5-5`.
+**Cost.** `provoke` measured at about $0.15 and 85 seconds on Opus 5.5 (18 November 2026). A default `diverge` is roughly 30 to 40 calls; see the benchmark section of the integration plan for measured cost. The call ceiling is enforced before every call, and every report includes `usage` with token counts and estimated cost. A cheaper judge is one variable away: `DIVERGENT_MODEL_JUDGE=claude-sonnet-5-5`.
 
 ## Verification status
 
 | Check | Status |
 |---|---|
 | Typecheck and build | Pass |
-| 21 unit and pipeline tests with a scripted model (gate, regression guard, budget ceiling, usefulness floor, namespace memory, provoke, score, challenge, bandit, MMR) | Pass |
+| 22 unit and pipeline tests with a scripted model (gate, regression guard, budget ceiling, usefulness floor, namespace memory, record, provoke, score, challenge, bandit, MMR) | Pass |
+| Live end-to-end run against the Claude API (`provoke`, 18 November 2026) | Pass: 12 generated, 1 rejected as a rewording, 4 selected, $0.15 |
 | Gate calibration with the real embedder (`npm run calibrate`) | Pass, table above |
 | MCP server over stdio: tool listing, zero-call scoring, clean error without a key | Pass |
 | HTTP server: health, auth, validation, zero-call scoring | Pass |
