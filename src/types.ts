@@ -44,6 +44,7 @@ export type NodeStatus =
   | "rejected_duplicate" // too close to a sibling already accepted
   | "rejected_archive" // the engine has already given this idea before
   | "rejected_anchor_word" // contains a banned anchor word
+  | "rejected_incomplete" // a title, mechanism, reason or first step came back empty
   | "rejected_regression" // a mutation that slid back toward the consensus
   | "rejected_judge" // failed the judged usefulness floor
   | "accepted"

@@ -8,13 +8,13 @@ as_of: 2026-11-18
 
 ## Where it is right now
 
-<!-- north-star-state {"week_of":"2026-11-16","week_target":null,"current":null,"current_as_of":null,"current_source":null,"urgency":4,"urgency_reason":"not measured yet; ladder pending its first reading"} --> **North Star number: U4, not measured.** Engine-made ideas Krish approves per week: not measured yet, ladder pending its first reading, on the way to 5 a week by 28 December 2026 (target proposed). Measuring it comes first: the Phase 0 plays for Heartside and Mindmake are its first reading.
+<!-- north-star-state {"week_of":"2026-11-16","week_target":2,"current":2,"current_as_of":"2026-11-18","current_source":"docs/approvals.md, Krish's approvals of engine-made ideas","urgency":1,"urgency_reason":"first reading, which sets week one of the ladder"} --> **North Star number: U1, on pace.** Engine-made ideas Krish approves per week: 2 (week of 16 November, the first reading and week one of the ladder), on the way to 5 a week by 28 December 2026 (target proposed). Both Phase 0 plays approved: Heartside realtor closing gifts, Mindmake dated miss report.
 
 v0.1 on `main`. MCP server, HTTP API, CLI and library. 22 tests pass. The novelty gate is calibrated on real embeddings. A live run against the Claude API works end to end (`provoke`, about $0.15). The live benchmark passed 3 of 3 against a prompt-matched single call (18 November): further from the consensus every time, usefulness held, originality mixed. A full `diverge` costs about $1. Details in [docs/integration-plan.md](docs/integration-plan.md#benchmark-result).
 
 **North Star (Ruling, Krish, 2026-11-18).** Engine-made ideas Krish approves per week across the fleet ([docs/NORTH_STAR.md](docs/NORTH_STAR.md)). Counted in [docs/approvals.md](docs/approvals.md).
 
-**Next.** Run `diverge` by hand for Heartside's U5 recovery plays and Mindmake's routes to meetings, from a Claude Code session with the MCP server registered, and put the top play from each through the engines' normal proposal flow. Count approvals. That count decides whether to build the Control Center route (Phase 1 of the integration plan).
+**Next.** Krish gives each approved play to its engine as his instruction in Control Center (the texts are in `now-notes/2026-11-18-phase0.md`). Then measure whether either play produces an order or a good meeting. Two approvals in week one meets the bar to start Phase 1, the Control Center route.
 
 **Waiting on Krish.**
 - Confirm the North Star's target and deadline (proposed: 5 a week by 28 December 2026).

@@ -512,6 +512,9 @@ export class DivergentEngine {
       bannedWords: args.bannedWords,
       calibration: run.calibration,
     });
+    // An idea missing any of its four parts never reaches a person half-written
+    // (first live runs, 18 November: one spark came back with no reason it was non-obvious).
+    const incomplete = [args.idea.title, args.idea.mechanism, args.idea.whyNonObvious, args.idea.firstStep].some((f) => !f || !f.trim());
     const node: ThoughtNode = {
       id,
       kind: args.kind,
@@ -520,12 +523,12 @@ export class DivergentEngine {
       stimulus: args.stimulus,
       wave: args.wave,
       idea: args.idea,
-      status,
+      status: incomplete && status === "accepted" ? "rejected_incomplete" : status,
       metrics,
     };
     run.nodes.set(id, node);
     run.vectors.set(id, vector!);
-    run.emit({ type: "node", node: { id, kind: node.kind, lens: node.lens, status, title: args.idea.title } });
+    run.emit({ type: "node", node: { id, kind: node.kind, lens: node.lens, status: node.status, title: args.idea.title } });
     return node;
   }
 

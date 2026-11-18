@@ -156,3 +156,14 @@ test("record seeds namespace memory, and score flags repeats and banned words wi
   assert.equal(res.results[1]!.status, "rejected_anchor_word");
   assert.equal(res.results[2]!.status, "accepted");
 });
+
+test("an idea missing any of its four parts is rejected, never selected", async () => {
+  const provider = scriptedProvider();
+  (provider as unknown as { handlers: Record<string, unknown> }).handlers.diverge = () => ({
+    ideas: [{ title: "Half an idea", mechanism: "Bakers trade starter cultures with brewers at dawn markets", whyNonObvious: "", firstStep: "Ask one brewer." }],
+  });
+  const engine = new DivergentEngine({ provider, embedder: embedder(), archiveRoot: await tempHome() });
+  const r = await engine.run({ problem: "bakery", count: 1, seed: 4, dialecticRounds: 0, crossPollinate: false, maxWaves: 1, lensesPerWave: 1, remember: false });
+  assert.equal(r.sparks.length, 0);
+  assert.equal(r.stats.rejected.rejected_incomplete, 1);
+});
