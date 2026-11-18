@@ -1,0 +1,56 @@
+{
+  "name": "divergent-thinker",
+  "version": "0.1.0",
+  "description": "A divergent thinking engine: maps the consensus, forces lateral branches, attacks them adversarially, and returns a scored portfolio of ideas your other engines can build on.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --import tsx --test test/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "mcp": "node dist/mcp.js",
+    "serve": "node dist/http.js",
+    "cli": "node dist/cli.js",
+    "bench": "node --import tsx bench/bench.mts",
+    "calibrate": "node --import tsx bench/calibrate.mts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krishanraja/divergent-thinker.git"
+  },
+  "keywords": [
+    "divergent-thinking",
+    "creativity",
+    "mcp",
+    "claude",
+    "ideation"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/krishanraja/divergent-thinker/issues"
+  },
+  "homepage": "https://github.com/krishanraja/divergent-thinker#readme",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "optionalDependencies": {
+    "@huggingface/transformers": "^4.3.2"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "divergent": "dist/cli.js",
+    "divergent-mcp": "dist/mcp.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "private": true
+}
