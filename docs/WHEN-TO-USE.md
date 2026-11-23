@@ -87,6 +87,8 @@ Shipped something? -> record it (free).
 | content-engine | the daily wildcard; the repeat guard beside `repeat_review`; a piece's angle before the lock; directed shoots | `provoke`, `score`, `record`, `map`, `challenge` | `content-engine:ideas` and lanes | live, #849 |
 | growth-legibility, growth-fulltime | the same as the other growth engines | as above | their slugs | held: wire on release, copying growth-heartside |
 | Krish's own sessions | strategy-brief alternatives, the sharper alternative to a call, design's divergence arm, a reset after rejected mocks | `map`, `challenge`, `score`, one `diverge` arm | the venture's slug | connector tools, live |
+| strategist | `map` to see the consensus on a portfolio call before it is made; `challenge` on the lead recovery play before it reaches Krish | `map`, `challenge` | `strategist` | new: a specialist engine, through the Control Center engine route |
+| internal-auditor | tell whether a repository's additions are novel or rehashed instructions, against what it already holds | `score` only (free) | `internal-auditor` | new: a specialist engine, through the Control Center engine route |
 | AEO-Engine | flag recommendation angles that only repeat the first-cited pages, as a flag, never a filter | `score` | `aeo-engine` | optional; never on the questions it measures |
 | hunter | catch boilerplate cover-letter hooks | `score` | `hunter` | optional; its generation is anchored to evidence on purpose |
 | higgsfield work | concept stage of a thumbnail or faceless video, before any generation spend | `provoke` with `target: design` or `video` | the venture's slug | from a session, through the connector |
