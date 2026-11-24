@@ -1,0 +1,40 @@
+name: CI
+
+# The quick checks this repository's AGENTS.md asks for before pushing: types,
+# the unit tests, the build, and that the committed dist/ matches it (Control
+# Center installs a pinned tarball with no build step). The internal auditor's
+# central merger merges a green pull request here (Ruling, Krish, 2026-11-24:
+# all repos auto merge, the auditor merges centrally); it never merges one with
+# no checks, so this is what lets it. `npm run calibrate` stays a local step
+# after any change to the gate or the embedder.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run check:dist
