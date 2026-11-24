@@ -2,7 +2,7 @@
 /**
  * MCP server (stdio). Lets Claude Code, Claude Desktop and any MCP host consult the engine.
  *
- *   claude mcp add divergent -- node /path/to/divergent-thinker/dist/mcp.js
+ *   claude mcp add divergent -- node /path/to/divergence-engine/dist/mcp.js
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -15,7 +15,7 @@ let enginePromise = null;
 const engine = () => (enginePromise ??= createEngine({ onWarning: (m) => console.error(`[divergent] ${m}`) }));
 const json = (data) => ({ content: [{ type: "text", text: JSON.stringify(data, null, 2) }] });
 const fail = (err) => ({ isError: true, content: [{ type: "text", text: err.message }] });
-const server = new McpServer({ name: "divergent-thinker", version: "0.1.0" });
+const server = new McpServer({ name: "divergence-engine", version: "0.1.0" });
 server.registerTool("diverge", {
     title: "Divergent brainstorm",
     description: "Full divergent thinking run. Maps what everyone else would say, generates ideas through cognitive lenses that are forbidden from repeating it, attacks the best survivors adversarially, judges blind, and returns a diverse portfolio of scored sparks, each with a ready-to-run prompt. About 25 to 40 model calls. Use before committing to an approach when the default answer is not good enough.",

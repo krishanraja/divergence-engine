@@ -1,4 +1,4 @@
-# divergent-thinker
+# divergence-engine
 
 **The engine your other engines consult when the obvious answer is not good enough.**
 
@@ -87,7 +87,7 @@ All four share one engine.
 
 ```bash
 npm install && npm run build
-claude mcp add divergent -e ANTHROPIC_API_KEY=... -- node /absolute/path/to/divergent-thinker/dist/mcp.js
+claude mcp add divergent -e ANTHROPIC_API_KEY=... -- node /absolute/path/to/divergence-engine/dist/mcp.js
 ```
 
 | Tool | Calls | Use |
@@ -122,10 +122,12 @@ node dist/cli.js --mode score --ideas outputs.json "the problem those outputs an
 ### Library
 
 ```ts
-import { createEngine } from "divergent-thinker";
+import { createEngine } from "divergence-engine";
 const engine = await createEngine();
 const report = await engine.run({ problem, namespace: "content-engine", target: "writing", count: 5 });
 ```
+
+The package was called `divergent-thinker` until 2026-11-24. A host that installs it under the dependency key `divergent-thinker` (Control Center pins a tarball that way) keeps importing `divergent-thinker` and `divergent-thinker/core` unchanged, because npm installs a tarball or git dependency under its dependency key. Move the key and the imports to `divergence-engine` together, whenever the pin is next bumped. The `divergent` and `divergent-mcp` commands stay beside `divergence-engine` and `divergence-engine-mcp`.
 
 ## Configuration
 

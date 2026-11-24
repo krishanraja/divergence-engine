@@ -77,5 +77,5 @@ const server = createServer(async (req, res) => {
         return send(res, 500, { error: err.message });
     }
 });
-server.listen(port, host, () => console.error(`divergent-thinker listening on http://${host}:${port}`));
+server.listen(port, host, () => console.error(`divergence-engine listening on http://${host}:${port}`));
 //# sourceMappingURL=http.js.map

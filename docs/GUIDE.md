@@ -118,7 +118,7 @@ Each is a way out of the middle. The engine picks them for you, but knowing them
 ### From a Claude Code session (works today)
 
 ```bash
-claude mcp add divergent -- node /path/to/divergent-thinker/dist/mcp.js
+claude mcp add divergent -- node /path/to/divergence-engine/dist/mcp.js
 ```
 
 The six moves appear as tools. The session needs `ANTHROPIC_API_KEY` in its environment for any move that generates. `score_divergence` with a supplied consensus and `record_outputs` need no key at all.
@@ -148,9 +148,9 @@ report = consult("score", {"problem": "...", "obvious": [...], "ideas": [...], "
 
 ```ts
 // Everything, with the local embedding model and the Anthropic SDK:
-import { createEngine } from "divergent-thinker";
+import { createEngine } from "divergence-engine";
 // Or the core alone, for a serverless host that supplies its own model provider,
-// embedder and memory store: import { DivergentEngine } from "divergent-thinker/core";
+// embedder and memory store: import { DivergentEngine } from "divergence-engine/core";
 const engine = await createEngine();
 const { sparks } = await engine.provoke({ problem, namespace: "content-engine-ideas", target: "writing" });
 ```
@@ -167,7 +167,7 @@ Growth runners hold no model keys, by design, so the fleet reaches the engine th
 
 Caps per caller per day: one `diverge`, twenty `provoke`, `challenge` or `map`, $5. `score` and `record` are free. Your namespace is your slug or `<slug>:<lane>`. Full contract: Control Center's `docs/app/everywhere/divergent.md`.
 
-**Label what you propose.** A proposal built from a spark carries one `evidence` item, `{ "label": "divergent-thinker spark <id>, run <run>", "url": null }`. That label is how Control Center counts the ideas Krish approves, which is this engine's North Star.
+**Label what you propose.** A proposal built from a spark carries one `evidence` item, `{ "label": "divergent-thinker spark <id>, run <run>", "url": null }`. That label is how Control Center counts the ideas Krish approves, which is this engine's North Star, so it keeps the old name: the package is now divergence-engine, but the label stays `divergent-thinker spark` until Control Center counts both.
 
 ---
 
@@ -216,10 +216,10 @@ Caps per caller per day: one `diverge`, twenty `provoke`, `challenge` or `map`, 
 ## A block to paste into your AGENTS.md
 
 ```markdown
-## Consult divergent-thinker
+## Consult divergence-engine
 
-When the obvious answer is not good enough, consult divergent-thinker
-(krishanraja/divergent-thinker; when to use it: docs/WHEN-TO-USE.md).
+When the obvious answer is not good enough, consult divergence-engine
+(krishanraja/divergence-engine; when to use it: docs/WHEN-TO-USE.md).
 Namespace: <your-engine-id> (or <your-engine-id>:<lane>).
 
 - A number at U4 or U5 with nothing proposed: `diverge`, target `strategy`,

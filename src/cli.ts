@@ -39,7 +39,7 @@ const { values, positionals } = parseArgs({
 
 const problem = positionals.join(" ").trim();
 if (!problem) {
-  console.error('usage: divergent [--mode run|provoke|map|score|challenge] "problem statement"');
+  console.error('usage: divergence-engine (or divergent) [--mode run|provoke|map|score|challenge] "problem statement"');
   process.exit(2);
 }
 
