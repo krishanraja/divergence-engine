@@ -2,7 +2,7 @@
 /**
  * MCP server (stdio). Lets Claude Code, Claude Desktop and any MCP host consult the engine.
  *
- *   claude mcp add divergent -- node /path/to/divergent-thinker/dist/mcp.js
+ *   claude mcp add divergent -- node /path/to/divergence-engine/dist/mcp.js
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -20,7 +20,7 @@ const engine = () => (enginePromise ??= createEngine({ onWarning: (m) => console
 const json = (data: unknown) => ({ content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] });
 const fail = (err: unknown) => ({ isError: true, content: [{ type: "text" as const, text: (err as Error).message }] });
 
-const server = new McpServer({ name: "divergent-thinker", version: "0.1.0" });
+const server = new McpServer({ name: "divergence-engine", version: "0.1.0" });
 
 server.registerTool(
   "diverge",

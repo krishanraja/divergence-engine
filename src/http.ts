@@ -75,4 +75,4 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(port, host, () => console.error(`divergent-thinker listening on http://${host}:${port}`));
+server.listen(port, host, () => console.error(`divergence-engine listening on http://${host}:${port}`));

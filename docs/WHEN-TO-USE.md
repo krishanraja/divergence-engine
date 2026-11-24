@@ -1,4 +1,4 @@
-# When to use divergent-thinker
+# When to use divergence-engine
 
 For any session, in any repository in the fleet, deciding whether to consult the engine and how to do it from where it stands. Read this first. [GUIDE.md](GUIDE.md) goes deeper on each move.
 
@@ -92,7 +92,7 @@ Shipped something? -> record it (free).
 | AEO-Engine | flag recommendation angles that only repeat the first-cited pages, as a flag, never a filter | `score` | `aeo-engine` | optional; never on the questions it measures |
 | hunter | catch boilerplate cover-letter hooks | `score` | `hunter` | optional; its generation is anchored to evidence on purpose |
 | higgsfield work | concept stage of a thumbnail or faceless video, before any generation spend | `provoke` with `target: design` or `video` | the venture's slug | from a session, through the connector |
-| humour-engine | downstream partner: divergent-thinker makes comic variants, humour-engine checks they land | none inside it | none | never its judge |
+| humour-engine | downstream partner: divergence-engine makes comic variants, humour-engine checks they land | none inside it | none | never its judge |
 | inspirationhouse | supplies the rejection floor and cues that become other namespaces' `cliches` and `bannedWords` | none | none | supplier |
 | content-watcher, krish-clone | none: model-free or no creative step | none | none | no |
 

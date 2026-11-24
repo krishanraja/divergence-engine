@@ -1,4 +1,4 @@
-# Integration plan: who consults divergent-thinker, where, and when
+# Integration plan: who consults divergence-engine, where, and when
 
 As of 2026-11-18. Built from a source-level read of ai-harness, control-center, content-engine, inspirationhouse, content-watcher, humour-engine, the five growth-* repos, mindmake, AEO-Engine, hunter, higgsfield-generator and krish-clone. Every load-bearing claim below was checked by an independent verifier told to refute it. Corrections from that pass are folded in.
 
@@ -135,7 +135,7 @@ Send de-identified text only, keep the archive out of every repository, and reco
 ## Next 24 to 72 hours
 
 1. The benchmark passed (below), so no fallback is needed.
-2. Register the MCP server on your machine: `claude mcp add divergent -- node /path/to/divergent-thinker/dist/mcp.js`, with your key in the environment.
+2. Register the MCP server on your machine: `claude mcp add divergent -- node /path/to/divergence-engine/dist/mcp.js`, with your key in the environment.
 3. Run `diverge` for Heartside's U5 plays with the order-loop plays as `cliches`, and for Mindmake's routes to meetings. Put the top play from each in front of you through the engines' normal proposal flow.
 4. Count how many you approve. That number, not the benchmark, decides Phase 1.
 
