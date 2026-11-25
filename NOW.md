@@ -8,7 +8,7 @@ as_of: 2026-11-18
 
 ## Where it is right now
 
-<!-- north-star-state {"week_of":"2026-11-16","week_target":2,"current":2,"current_as_of":"2026-11-18","current_source":"docs/approvals.md, Krish's approvals of engine-made ideas","urgency":1,"urgency_reason":"first reading, which sets week one of the ladder"} --> **North Star number: U1, on pace.** Engine-made ideas Krish approves per week: 2 (week of 16 November, the first reading and week one of the ladder), on the way to 5 a week by 28 December 2026 (target confirmed). Both Phase 0 plays approved: Heartside realtor closing gifts, Mindmake dated miss report.
+<!-- north-star-state {"week_of":"2026-11-23","week_target":2,"current":0,"current_as_of":"2026-11-25","current_source":"Control Center growth_engine_proposals approved by Krish this ISO week whose evidence carries a divergence-engine spark label","urgency":4,"urgency_reason":"at 0% of this week's target"} --> **North Star number: U4, far behind.** Engine-made ideas Krish approves per week, across the fleet: 0, against 2 this week, on the way to 5 by 28 December 2026. A bold swing every day; work that does not move the number waits.
 
 v0.1 on `main`. MCP server, HTTP API, CLI and library. 22 tests pass. The novelty gate is calibrated on real embeddings. A live run against the Claude API works end to end (`provoke`, about $0.15). The live benchmark passed 3 of 3 against a prompt-matched single call (18 November): further from the consensus every time, usefulness held, originality mixed. A full `diverge` costs about $1. Details in [docs/integration-plan.md](docs/integration-plan.md#benchmark-result).
 
